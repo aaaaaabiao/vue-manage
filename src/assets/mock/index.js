@@ -1,9 +1,11 @@
+/* eslint-disable no-unused-vars */
 /* mock配置文件
   ps：mock模块会影响原生的ajax请求，使得服务器返回的blob类型变成乱码，
   所以如果在代码中有使用blob时，需要在mainjs中把mock注释掉，才能正常使用
 */
 // 引入mockjs
 import Mock from 'mockjs'
+import UserManage from './userManage'
 // 获取 mock.Random 对象
 const Random = Mock.Random
 const result = {
@@ -57,11 +59,108 @@ const smsData = () => {
 
 const permissionData = () => {
   result.data = [
+    // {
+    //   name: 'Table',
+    //   children: [
+    //     {
+    //       name: 'TableDemo',
+    //       auth: {
+    //         add: true,
+    //         check: true,
+    //         delete: true,
+    //         edit: true
+    //       }
+    //     },
+    //     {
+    //       name: 'DemoTest',
+    //       auth: {
+    //         add: true,
+    //         check: true,
+    //         delete: true,
+    //         edit: true
+    //       }
+    //     }
+    //   ]
+    // },
     {
-      name: 'Table',
+      name: 'userManage',
       children: [
         {
-          name: 'TableDemo',
+          name: 'studentUser',
+          auth: {
+            add: true,
+            check: true,
+            delete: true,
+            edit: true
+          }
+        },
+        {
+          name: 'adminUser',
+          auth: {
+            add: true,
+            check: true,
+            delete: true,
+            edit: true
+          }
+        }
+      ]
+    },
+
+    {
+      name: 'qaManage',
+      children: [
+        {
+          name: 'question',
+          auth: {
+            add: true,
+            check: true,
+            delete: true,
+            edit: true
+          }
+        },
+        {
+          name: 'answer',
+          auth: {
+            add: true,
+            check: true,
+            delete: true,
+            edit: true
+          }
+        },
+        {
+          name: 'course',
+          auth: {
+            add: true,
+            check: true,
+            delete: true,
+            edit: true
+          }
+        }, {
+          name: 'knowledge',
+          auth: {
+            add: true,
+            check: true,
+            delete: true,
+            edit: true
+          }
+        }
+      ]
+    },
+
+    {
+      name: 'dataAnalyze',
+      children: [
+        {
+          name: 'dataAnswer',
+          auth: {
+            add: true,
+            check: true,
+            delete: true,
+            edit: true
+          }
+        },
+        {
+          name: 'dataQuestion',
           auth: {
             add: true,
             check: true,
@@ -71,6 +170,7 @@ const permissionData = () => {
         }
       ]
     }
+
   ]
   return result
 }
@@ -78,3 +178,4 @@ Mock.mock('/apiReplace/login', 'post', loginData)
 Mock.mock('/apiReplace/sendSms', 'post', smsData)
 Mock.mock('/apiReplace/permission', 'post', permissionData)
 Mock.mock('/apiReplace/table', 'post', tableData)
+

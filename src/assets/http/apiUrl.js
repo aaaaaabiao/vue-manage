@@ -12,11 +12,16 @@ const SendSms = `${apiHost}sendSms`
 const GetPermissionData = `${apiHost}permission`
 // 表格模拟数据
 const GetTableData = `${apiHost}table`
-
+// 用户数据
+const userData = `${apiHost}userData`
+// 管理员数据
+const adminData = `${apiHost}adminData`
 export default {
   Login,
   LoginByVin,
   SendSms,
   GetPermissionData,
-  GetTableData
+  GetTableData,
+  userData,
+  adminData
 }

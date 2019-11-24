@@ -10,9 +10,17 @@ module.exports = {
   assetsDir: 'assets', // 静态资源文件夹
   productionSourceMap: false,
   devServer: {
-    port: 9566, // 端口号
+    port: 8010, // 端口号
     open: true,
-    proxy: null // 设置代理
+    proxy: {
+      '/apiReplace': {
+        target: 'http://127.0.0.1:8080', // 后端提供的接口地址
+        changOrigin: false,
+        pathRewrite: {
+          '^/apiReplace': ''
+        }
+      }
+    } // 设置代理
   },
   css: {
     loaderOptions: {
