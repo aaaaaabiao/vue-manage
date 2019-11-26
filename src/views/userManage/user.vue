@@ -87,7 +87,6 @@
 export default {
   data() {
     return {
-
       queryParams : {
         userId : "",
         userName : "",
@@ -126,6 +125,9 @@ export default {
           url: this.API.userData,
           noLoading: true,
           params: {
+            userId:this.queryParams.userId,
+            userName: this.queryParams.userName,
+            dateRange: this.queryParams.dateRange,
             page: this.currentPage,
             limit: this.pageSize
           },
@@ -141,8 +143,18 @@ export default {
         });
       }, 3000);
     },
-    test(row) {
-      console.log("tableRow", row);
+    
+
+    handleQuery() {
+      this.getData()
+    },
+
+    resetQuery() {
+      this.queryParams = {
+        userId : "",
+        userName : "",
+        dateRange:[]
+      }
     }
   }
 };
