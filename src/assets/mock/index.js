@@ -15,7 +15,7 @@ const result = {
   resultCode: 1,
   resultMessage: 'success'
 }
-// mock一组数据
+// 登陆接口
 const loginData = () => {
   result.data = {
     token: Random.string(10),
@@ -153,30 +153,30 @@ const permissionData = () => {
           }
         }
       ]
-    },
-    {
-      name: 'dataAnalyze',
-      children: [
-        {
-          name: 'dataAnswer',
-          auth: {
-            add: true,
-            check: true,
-            delete: true,
-            edit: true
-          }
-        },
-        {
-          name: 'dataQuestion',
-          auth: {
-            add: true,
-            check: true,
-            delete: true,
-            edit: true
-          }
-        }
-      ]
     }
+    // {
+    //   name: 'dataAnalyze',
+    //   children: [
+    //     {
+    //       name: 'dataAnswer',
+    //       auth: {
+    //         add: true,
+    //         check: true,
+    //         delete: true,
+    //         edit: true
+    //       }
+    //     },
+    //     {
+    //       name: 'dataQuestion',
+    //       auth: {
+    //         add: true,
+    //         check: true,
+    //         delete: true,
+    //         edit: true
+    //       }
+    //     }
+    //   ]
+    // }
 
   ]
   return result

@@ -182,12 +182,7 @@ export default {
         dateRange: []
       },
 
-      roleDict: [
-        { label: "超级管理员", value: 1 },
-        { label: "管理员", value: 2 },
-        { label: "课程负责人", value: 3 },
-        { label: "任课教师", value: 4 }
-      ],
+      roleDict: this.COMMON.roleDict,
 
       tableLoading: false,
       tableHeader: {

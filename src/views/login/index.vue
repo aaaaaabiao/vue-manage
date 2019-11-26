@@ -42,7 +42,16 @@
               @keyup.enter.native="handleLogin"
             />
           </el-form-item>
-          <div class="forget-psw" @click="$router.push({name: 'ResetPsw'})">忘记密码？</div>
+          <el-form-item label="" prop="roleId">
+            <el-select v-model="loginForm.roleId" placeholder="角色" clearable size="mid">
+              <el-option
+                v-for="role in roleDict"
+                :key="role.value"
+                :label="role.label"
+                :value="role.value"
+              />
+            </el-select>
+          </el-form-item>
         </template>
         <el-form-item>
           <el-button
@@ -58,26 +67,21 @@
 </template>
 
 <script>
-import { isvalidPhoneNumber, isvalidCode } from "@/assets/utils/validate";
 export default {
   name: "Login",
   data() {
-    const validatePass = (rule, value, callback) => {
-      if (value.length < 6) {
-        callback(new Error("密码不少于6位"));
-      } else {
-        callback();
-      }
-    };
 
     return {
+      roleDict: this.COMMON.roleDict,
       loginForm: {
         user: "",
         password: "",
+        roleId: undefined
       },
       loginByPswRules: {
         user: [{ required: true, trigger: "blur", message: "请输入用户名" }],
-        password: [{ required: true, trigger: "blur", validator: validatePass }]
+        password: [{ required: true, trigger: "blur", message: "请输入密码" }],
+        roleId: [{required: true, trigger: "blur", message: "请选择角色"}]
       },
       loading: false,
       pwdType: "password",
@@ -103,7 +107,8 @@ export default {
 
           params = {
             username: this.loginForm.user,
-            password: this.loginForm.password
+            password: this.loginForm.password,
+            roleId: this.loginForm.roleId
           };
           this.$store
             .dispatch("Login", params)

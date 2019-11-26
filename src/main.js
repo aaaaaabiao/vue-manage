@@ -19,13 +19,14 @@ Es6Promise.polyfill()
 
 import Api from '@/assets/http/apiUrl'
 import Request from '@/assets/http'
-
+import Common from './components/common'
 Vue.config.productionTip = false
 Vue.use(ElementUI, {
   locale
 })
 Vue.prototype.API = Api
 Vue.prototype.$request = Request
+Vue.prototype.COMMON = Common
 
 new Vue({
   router,
