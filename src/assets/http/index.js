@@ -84,7 +84,7 @@ function httpRequest(options = {}) {
       background: 'rgba(0, 0, 0, 0.7)'
     })
   }
-
+  console.log(options)
   try {
     requestMethods(options).then(response => {
       // 成功返回结果的逻辑。根据接口定义的数据返回格式 修改判断条件

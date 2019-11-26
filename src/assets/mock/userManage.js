@@ -44,6 +44,17 @@ const deleteUser = () => {
   return result
 }
 
+const selectAdminByID = () => {
+  result.data = {
+    userId: '123',
+    username: '小明',
+    password: '123456',
+    role: 3,
+    courseId: 1
+  }
+  return result
+}
+
 const adminData = () => {
   //   // json文件数据
   //   const data = {
@@ -70,6 +81,27 @@ const adminData = () => {
   return result
 }
 
+const addAdmin = data => {
+  result.data = {}
+  return result
+}
+
+const deleteAdmin = () => {
+  result.data = {}
+  return result
+}
+
+const updateAdmin = () => {
+  result.data = {}
+  return result
+}
+
 Mock.mock('/apiReplace/userData', 'post', userData)
 Mock.mock('/apiReplace/adminData', 'post', adminData)
 Mock.mock('/apiReplace/deleteUser', 'post', deleteUser)
+Mock.mock('/apiReplace/selectAdminByID', 'post', selectAdminByID)
+
+Mock.mock('/apiReplace/addAdmin', 'post', addAdmin)
+Mock.mock('/apiReplace/deleteAdmin', 'post', deleteAdmin)
+Mock.mock('/apiReplace/updateAdmin', 'post', updateAdmin)
+

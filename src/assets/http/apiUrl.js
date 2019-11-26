@@ -12,12 +12,25 @@ const SendSms = `${apiHost}sendSms`
 const GetPermissionData = `${apiHost}permission`
 // 表格模拟数据
 const GetTableData = `${apiHost}table`
+
+
 // 用户数据
 const userData = `${apiHost}userData`
-
+// 删除学生用户
 const deleteUser = `${apiHost}deleteUser`
+ 
 // 管理员数据
 const adminData = `${apiHost}adminData`
+// 添加管理员
+const addAdmin = `${apiHost}addAdmin`
+// 修改管理员
+const updateAdmin = `${apiHost}updateAdmin`
+// 删除管理员
+const deleteAdmin = `${apiHost}deleteAdmin`
+
+
+// 根据Id查询
+const selectAdminByID = `${apiHost}selectAdminByID`
 // 问题数据
 const questionListData = `${apiHost}questionListData`
 // 课程章节数据
@@ -26,6 +39,9 @@ const courseChapterData = `${apiHost}courseChapterData`
 const courseChapterTreeData = `${apiHost}courseChapterTreeData`
 // 课程章节树形结构
 const knowledgeListData = `${apiHost}knowledgeListData`
+// 得到课程信息
+const getAllCourseInfo = `${apiHost}getAllCourseInfo`
+
 export default {
   Login,
   LoginByVin,
@@ -38,5 +54,10 @@ export default {
   questionListData,
   courseChapterData,
   courseChapterTreeData,
-  knowledgeListData
+  knowledgeListData,
+  selectAdminByID,
+  addAdmin,
+  updateAdmin,
+  deleteAdmin,
+  getAllCourseInfo
 }

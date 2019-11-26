@@ -37,5 +37,16 @@ const questionListData = () => {
   result.data = data
   return result
 }
+
+const getAllCourseInfo = () => {
+  result.data = [
+    { courseName: '数据结构', id: 1 },
+    { courseName: '计算机组成原理', id: 2 },
+    { courseName: '操作系统', id: 3 },
+    { courseName: '计算机网络', id: 4 }
+  ]
+  return result
+}
 Mock.mock('/apiReplace/questionListData', 'post', questionListData)
+Mock.mock('/apiReplace/getAllCourseInfo', 'post', getAllCourseInfo)
 

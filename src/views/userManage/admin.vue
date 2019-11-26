@@ -84,7 +84,7 @@
           <el-table-column label="操作" width="230" align="center" class-name="operation">
             <template slot-scope="scope">
               <a class="item" @click="handleUpdate(scope.row)">修改</a>
-              <a v-if="$route.meta.delete" class="item" @click="test(scope.row)">删除</a>
+              <a v-if="$route.meta.delete" class="item" @click="handleDelete(scope.row)">删除</a>
             </template>
           </el-table-column>
         </el-table>
@@ -108,7 +108,7 @@
 
     <!-- 新增 -->
     <el-dialog :title="title" :visible.sync="open" width="800px">
-      <el-form ref="form" :model="addAdminform" :rules="rules" label-width="80px">
+      <el-form ref="addAdminform" :model="addAdminform" :rules="rules" label-width="80px">
         <el-row>
           <el-col :span="12">
             <el-form-item label="用户名" prop="username">
@@ -122,12 +122,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="角色" prop="role">
-              <el-select
-                v-model="addAdminform.role"
-                :placeholder="请选择角色"
-                @change="getValue"
-                style="width:100%;"
-              >
+              <el-select v-model="addAdminform.role" :placeholder="请选择角色" style="width:100%;">
                 <el-option
                   v-for="item in roleDict"
                   :key="item.value"
@@ -137,7 +132,7 @@
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="12" v-if="showCourseType">
+          <el-col :span="12" v-if="this.addAdminform.role == 3 || this.addAdminform.role == 4">
             <el-form-item label="课程">
               <el-select v-model="addAdminform.courseId" :placeholder="请选择对应课程" style="width:100%;">
                 <el-option
@@ -150,7 +145,6 @@
             </el-form-item>
           </el-col>
         </el-row>
-        
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -167,13 +161,17 @@ export default {
     return {
       // 表单参数
       addAdminform: {},
-      showCourseType: false,
-      courses: [
-        { label: "数据结构", value: 1 },
-        { label: "计算机组成原理", value: 2 },
-        { label: "操作系统", value: 3 },
-        { label: "计算机网络", value: 4 }
-      ],
+      courses: [],
+
+      rules: {
+        username: [
+          { required: true, message: "用户名称不能为空", trigger: "blur" }
+        ],
+        password: [
+          { required: true, message: "密码名称不能为空", trigger: "blur" }
+        ],
+        role: [{ required: true, message: "角色不能为空", trigger: "blur" }]
+      },
       open: false,
       queryParams: {
         userId: "",
@@ -219,7 +217,7 @@ export default {
           url: this.API.adminData,
           noLoading: true,
           params: {
-            userId:this.queryParams.userId,
+            userId: this.queryParams.userId,
             userName: this.queryParams.userName,
             dateRange: this.queryParams.dateRange,
             role: this.queryParams.roleId,
@@ -244,13 +242,15 @@ export default {
 
     reset() {
       this.addAdminform = {
-        username: "",
-        password: "",
-        role: "",
-        courseId: ""
+        userId: undefined,
+        username: undefined,
+        password: undefined,
+        role: undefined,
+        courseId: undefined
       };
     },
     handleAdd() {
+      this.getCourseInfo()
       this.reset();
       this.open = true;
       this.title = "添加管理员";
@@ -260,31 +260,132 @@ export default {
       this.open = false;
     },
 
-    getValue(val) {
-      if (val == 3 || val == 4) {
-        this.showCourseType = true;
-      } else {
-        this.showCourseType = false;
-      }
-    },
-
+    //修改
     handleUpdate(row) {
-      this.reset();
-      this.open = true;
-      this.title = "修改管理员"
+      this.getCourseInfo()
+      const userId = row.id;
+      this.$request.httpRequest({
+        method: "post",
+        url: this.API.selectAdminByID,
+        params: {
+          userId: userId
+        },
+        success: data => {
+          this.addAdminform = data;
+          this.title = "修改管理员";
+          this.open = true;
+        }
+      });
     },
 
     handleQuery() {
-      this.getData()
+      this.getData();
+    },
+
+    deleteAdmin(userId) {
+      this.$request.httpRequest({
+        method: "post",
+        url: this.API.deleteAdmin,
+        params: {
+          userId: userId
+        },
+        success: data => {
+          this.getData();
+          this.msgSuccess("删除成功");
+        },
+        error: e => {
+          this.msgError("删除失败");
+        }
+      });
+    },
+
+    /** 删除按钮操作 */
+    handleDelete(row) {
+      const username = row.name;
+      const userId = row.id;
+      this.$confirm("是否确认删除用户:" + username + "?", "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        this.deleteAdmin(userId);
+      });
+    },
+
+    //获取所有课程
+    getCourseInfo() {
+      this.$request.httpRequest({
+        method: "post",
+        url: this.API.getAllCourseInfo,
+        success: data => {
+          data.forEach(item => {
+          const course = {};
+          course.label = item.courseName;
+          course.value = item.id;
+          this.courses.push(course);
+        });
+        },
+
+      });
+    },
+
+    //更新管理员信息
+    updateUser() {
+      this.$request.httpRequest({
+        method: "post",
+        url: this.API.updateAdmin,
+        params: this.addAdminform,
+        success: data => {
+          this.msgSuccess("修改成功");
+          this.open = false;
+          this.getData();
+        },
+        error: e => {
+          this.open = false
+          this.msgError("修改失败");
+        }
+      });
+    },
+
+    //添加管理员
+    addUser() {
+      this.$request.httpRequest({
+        method: "post",
+        url: this.API.addAdmin,
+        params: this.addAdminform,
+        success: data => {
+          this.msgSuccess("添加成功");
+          this.open = false;
+          this.getData();
+        },
+        error: e => {
+          this.open = false
+          this.msgError("添加失败");
+        }
+      });
+    },
+
+
+    //提交表单
+    submitForm() {
+      this.$refs.addAdminform.validate(valid => {
+        if (valid) {
+          if (this.addAdminform.userId != undefined) {
+            this.updateUser();
+          } else {
+            this.addUser();
+          }
+        }
+      });
     },
 
     resetQuery() {
       this.queryParams = {
-        userId : "",
-        userName : "",
-        dateRange:[],
-        roleId: undefined,
-      }
+        userId: "",
+        userName: "",
+        dateRange: [],
+        roleId: undefined
+      };
     }
   }
 };
