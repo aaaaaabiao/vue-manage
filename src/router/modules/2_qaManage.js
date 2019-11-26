@@ -22,22 +22,6 @@ const userManage = {
       meta: {
         title: '答案管理'
       }
-    },
-    {
-      path: '/qa/course',
-      name: 'course',
-      component: resolve => void require(['@/views/qaManage/course'], resolve),
-      meta: {
-        title: '课程管理'
-      }
-    },
-    {
-      path: '/qa/knowledge',
-      name: 'knowledge',
-      component: resolve => void require(['@/views/qaManage/knowledge'], resolve),
-      meta: {
-        title: '知识点管理'
-      }
     }
   ]
 }

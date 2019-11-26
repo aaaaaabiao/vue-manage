@@ -16,6 +16,14 @@ const GetTableData = `${apiHost}table`
 const userData = `${apiHost}userData`
 // 管理员数据
 const adminData = `${apiHost}adminData`
+// 问题数据
+const questionListData = `${apiHost}questionListData`
+// 课程章节数据
+const courseChapterData = `${apiHost}courseChapterData`
+// 课程章节树形结构
+const courseChapterTreeData = `${apiHost}courseChapterTreeData`
+// 课程章节树形结构
+const knowledgeListData = `${apiHost}knowledgeListData`
 export default {
   Login,
   LoginByVin,
@@ -23,5 +31,9 @@ export default {
   GetPermissionData,
   GetTableData,
   userData,
-  adminData
+  adminData,
+  questionListData,
+  courseChapterData,
+  courseChapterTreeData,
+  knowledgeListData
 }

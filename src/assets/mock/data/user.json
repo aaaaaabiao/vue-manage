@@ -2,7 +2,7 @@
     {
         "id":123,
         "name":123,
-        "gender" : "男",
+        "createdTime" : "2019-6-6",
         "email" : "736813089@qq.com"
     }
 ]

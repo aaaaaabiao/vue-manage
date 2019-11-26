@@ -6,6 +6,8 @@
 // 引入mockjs
 import Mock from 'mockjs'
 import UserManage from './userManage'
+import QaManage from './qaManage'
+import CourseManage from './courseManage'
 // 获取 mock.Random 对象
 const Random = Mock.Random
 const result = {
@@ -126,16 +128,22 @@ const permissionData = () => {
             delete: true,
             edit: true
           }
-        },
+        }
+      ]
+    },
+    {
+      name: 'courseManage',
+      children: [
         {
-          name: 'course',
+          name: 'chapter',
           auth: {
             add: true,
             check: true,
             delete: true,
             edit: true
           }
-        }, {
+        },
+        {
           name: 'knowledge',
           auth: {
             add: true,
@@ -146,7 +154,6 @@ const permissionData = () => {
         }
       ]
     },
-
     {
       name: 'dataAnalyze',
       children: [
