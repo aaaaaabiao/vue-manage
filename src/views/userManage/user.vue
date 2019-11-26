@@ -22,23 +22,23 @@
         />
       </el-form-item>
       <el-form-item label="创建时间">
-            <el-date-picker
-              v-model="queryParams.dateRange"
-              size="small"
-              style="width: 240px"
-              value-format="yyyy-MM-dd"
-              type="daterange"
-              range-separator="-"
-              start-placeholder="开始日期"
-              end-placeholder="结束日期"
-            ></el-date-picker>
-          </el-form-item>
+        <el-date-picker
+          v-model="queryParams.dateRange"
+          size="small"
+          style="width: 240px"
+          value-format="yyyy-MM-dd"
+          type="daterange"
+          range-separator="-"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+        ></el-date-picker>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
-    
+
     <el-card class="list-content" shadow="hover">
       <template v-if="$route.meta.check">
         <el-table
@@ -60,7 +60,7 @@
           />
           <el-table-column label="操作" width="230" align="center" class-name="operation">
             <template slot-scope="scope">
-              <a v-if="$route.meta.delete" class="item" @click="test(scope.row)">删除</a>
+              <a v-if="$route.meta.delete" class="item" @click="handleDelete(scope.row)">删除</a>
             </template>
           </el-table-column>
         </el-table>
@@ -87,10 +87,10 @@
 export default {
   data() {
     return {
-      queryParams : {
-        userId : "",
-        userName : "",
-        dateRange:[]
+      queryParams: {
+        userId: "",
+        userName: "",
+        dateRange: []
       },
       tableLoading: false,
       tableHeader: {
@@ -125,7 +125,7 @@ export default {
           url: this.API.userData,
           noLoading: true,
           params: {
-            userId:this.queryParams.userId,
+            userId: this.queryParams.userId,
             userName: this.queryParams.userName,
             dateRange: this.queryParams.dateRange,
             page: this.currentPage,
@@ -143,18 +143,47 @@ export default {
         });
       }, 3000);
     },
-    
 
     handleQuery() {
-      this.getData()
+      this.getData();
     },
 
     resetQuery() {
       this.queryParams = {
-        userId : "",
-        userName : "",
-        dateRange:[]
-      }
+        userId: "",
+        userName: "",
+        dateRange: []
+      };
+    },
+
+    deleteUserByUserId(userId) {
+      this.$request.httpRequest({
+          method: "post",
+          url: this.API.deleteUser,
+          params: {
+            userId: userId
+          },
+          success: data => {
+            this.getData();
+            this.msgSuccess("删除成功");
+          },
+          error: e => {
+            this.msgError("删除失败");
+          }
+        });
+    },
+
+    /** 删除按钮操作 */
+    handleDelete(row) {
+      const username = row.name;
+      const userId = row.id
+      this.$confirm("是否确认删除用户:" + username + "?", "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(()=> {
+        this.deleteUserByUserId(userId)
+      });
     }
   }
 };

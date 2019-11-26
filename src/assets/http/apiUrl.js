@@ -14,6 +14,8 @@ const GetPermissionData = `${apiHost}permission`
 const GetTableData = `${apiHost}table`
 // 用户数据
 const userData = `${apiHost}userData`
+
+const deleteUser = `${apiHost}deleteUser`
 // 管理员数据
 const adminData = `${apiHost}adminData`
 // 问题数据
@@ -31,6 +33,7 @@ export default {
   GetPermissionData,
   GetTableData,
   userData,
+  deleteUser,
   adminData,
   questionListData,
   courseChapterData,

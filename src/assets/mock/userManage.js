@@ -13,12 +13,12 @@ const result = {
   resultMessage: 'success'
 }
 const userData = () => {
-//   // json文件数据
-//   const data = {
-//     totalCount: length,
-//     currentPage: 1,
-//     data: userJson
-//   }
+  //   // json文件数据
+  //   const data = {
+  //     totalCount: length,
+  //     currentPage: 1,
+  //     data: userJson
+  //   }
 
   // 随机数据
   const length = Random.integer(1, 20)
@@ -39,13 +39,18 @@ const userData = () => {
   return result
 }
 
+const deleteUser = () => {
+  result.data = {}
+  return result
+}
+
 const adminData = () => {
-//   // json文件数据
-//   const data = {
-//     totalCount: length,
-//     currentPage: 1,
-//     data: adminListJson
-//   }
+  //   // json文件数据
+  //   const data = {
+  //     totalCount: length,
+  //     currentPage: 1,
+  //     data: adminListJson
+  //   }
   const length = Random.integer(1, 20)
   const data = {
     totalCount: length,
@@ -67,3 +72,4 @@ const adminData = () => {
 
 Mock.mock('/apiReplace/userData', 'post', userData)
 Mock.mock('/apiReplace/adminData', 'post', adminData)
+Mock.mock('/apiReplace/deleteUser', 'post', deleteUser)

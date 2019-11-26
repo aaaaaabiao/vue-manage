@@ -21,9 +21,21 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
+      <el-form-item label="创建时间">
+        <el-date-picker
+          v-model="queryParams.dateRange"
+          size="small"
+          style="width: 240px"
+          value-format="yyyy-MM-dd"
+          type="daterange"
+          range-separator="-"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+        ></el-date-picker>
+      </el-form-item>
       <el-form-item label="角色" prop="role">
         <el-select
-          v-model="queryParams.role"
+          v-model="queryParams.roleId"
           placeholder="角色"
           clearable
           size="small"
@@ -36,18 +48,6 @@
             :value="role.value"
           />
         </el-select>
-      </el-form-item>
-      <el-form-item label="创建时间">
-        <el-date-picker
-          v-model="queryParams.dateRange"
-          size="small"
-          style="width: 240px"
-          value-format="yyyy-MM-dd"
-          type="daterange"
-          range-separator="-"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-        ></el-date-picker>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -178,7 +178,7 @@ export default {
       queryParams: {
         userId: "",
         userName: "",
-        role: "",
+        roleId: undefined,
         dateRange: []
       },
 
@@ -219,6 +219,10 @@ export default {
           url: this.API.adminData,
           noLoading: true,
           params: {
+            userId:this.queryParams.userId,
+            userName: this.queryParams.userName,
+            dateRange: this.queryParams.dateRange,
+            role: this.queryParams.roleId,
             page: this.currentPage,
             limit: this.pageSize
           },
@@ -268,6 +272,19 @@ export default {
       this.reset();
       this.open = true;
       this.title = "修改管理员"
+    },
+
+    handleQuery() {
+      this.getData()
+    },
+
+    resetQuery() {
+      this.queryParams = {
+        userId : "",
+        userName : "",
+        dateRange:[],
+        roleId: undefined,
+      }
     }
   }
 };

@@ -27,6 +27,16 @@ Vue.use(ElementUI, {
 Vue.prototype.API = Api
 Vue.prototype.$request = Request
 Vue.prototype.COMMON = Common
+Vue.prototype.msgSuccess = function(msg) {
+  this.$message({ showClose: true, message: msg, type: 'success' })
+}
+Vue.prototype.msgError = function(msg) {
+  this.$message({ showClose: true, message: msg, type: 'error' })
+}
+
+Vue.prototype.msgInfo = function(msg) {
+  this.$message.info(msg)
+}
 
 new Vue({
   router,

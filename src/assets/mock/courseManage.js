@@ -67,7 +67,7 @@ const courseChapterTreeData = () => {
 const knowledgeListData = () => {
   // json文件数据
   const data = {
-    data: knowledgeList
+    data: courseChapterTree
   }
 
   //   // 随机数据
