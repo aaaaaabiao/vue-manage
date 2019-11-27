@@ -33,14 +33,22 @@ const deleteAdmin = `${apiHost}deleteAdmin`
 const selectAdminByID = `${apiHost}selectAdminByID`
 // 问题数据
 const questionListData = `${apiHost}questionListData`
+const deleteQuestion = `${apiHost}deleteQuestion`
+const answerListData = `${apiHost}questionListData`
+const deleteAnswer = `${apiHost}deleteAnswer`
+
+const selectAnswer = `${apiHost}selectAnswer`
 // 课程章节数据
 const courseChapterData = `${apiHost}courseChapterData`
 // 课程章节树形结构
 const courseChapterTreeData = `${apiHost}courseChapterTreeData`
-// 课程章节树形结构
 const knowledgeListData = `${apiHost}knowledgeListData`
-// 得到课程信息
 const getAllCourseInfo = `${apiHost}getAllCourseInfo`
+const addCourse = `${apiHost}addCourse`
+const addChapter = `${apiHost}addChapter`
+const updateChapter = `${apiHost}updateChapter`
+const selectChapter = `${apiHost}selectChapter`
+const deleteChapter = `${apiHost}deleteChapter`
 
 export default {
   Login,
@@ -59,5 +67,14 @@ export default {
   addAdmin,
   updateAdmin,
   deleteAdmin,
-  getAllCourseInfo
+  getAllCourseInfo,
+  addCourse,
+  addChapter,
+  updateChapter,
+  selectChapter,
+  deleteChapter,
+  deleteQuestion,
+  answerListData,
+  deleteAnswer,
+  selectAnswer
 }

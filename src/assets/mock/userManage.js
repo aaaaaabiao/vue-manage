@@ -9,8 +9,8 @@ import adminListJson from './data/adminList.json'
 const Random = Mock.Random
 const result = {
   data: {},
-  resultCode: 1,
-  resultMessage: 'success'
+  status: 1,
+  message: 'success'
 }
 const userData = () => {
   //   // json文件数据

@@ -159,12 +159,13 @@ export default {
     deleteUserByUserId(userId) {
       this.$request.httpRequest({
           method: "post",
-          url: this.API.deleteUser,
+          url: this.API.userData,
           params: {
             userId: userId
           },
           success: data => {
             this.getData();
+            console.log("删除成功")
             this.msgSuccess("删除成功");
           },
           error: e => {

@@ -1,23 +1,31 @@
 <template>
   <div class="table-demo">
     <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="68px">
+      <el-form-item label="问题ID" prop="answerId">
+        <el-input
+          v-model="queryParams.answerId"
+          placeholder="请输入问题ID"
+          clearable
+          size="small"
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
       <el-form-item label="标题" prop="userName">
         <el-input
           v-model="queryParams.title"
           placeholder="请输入标题"
           clearable
           size="small"
-          style="width: 240px"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
+      
       <el-form-item label="创建人" prop="userName">
         <el-input
           v-model="queryParams.creator"
           placeholder="请输入用户名称"
           clearable
           size="small"
-          style="width: 240px"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
@@ -27,7 +35,6 @@
           placeholder="课程"
           clearable
           size="small"
-          style="width: 240px"
         >
           <el-option
             v-for="course in courseDict"
@@ -111,7 +118,7 @@
           />
           <el-table-column label="操作" width="230" align="center" class-name="operation">
             <template slot-scope="scope">
-              <a v-if="$route.meta.delete" class="item" @click="test(scope.row)">删除</a>
+              <a v-if="$route.meta.delete" class="item" @click="handleDelete(scope.row)">删除</a>
             </template>
           </el-table-column>
         </el-table>
@@ -138,19 +145,9 @@
 export default {
   data() {
     return {
-      queryParams: {
-        title: "",
-        creator: "",
-        courseId: undefined,
-        dateRange: []
-      },
+      queryParams: {},
 
-      courseDict: [
-        { label: "数据结构", value: 1 },
-        { label: "计算机组成原理", value: 2 },
-        { label: "操作系统", value: 3 },
-        { label: "计算机网络", value: 4 }
-      ],
+      courseDict: [],
       tableLoading: false,
       tableHeader: {
         id: "ID",
@@ -167,6 +164,7 @@ export default {
     };
   },
   mounted() {
+    this.resetQuery()
     this.getData();
   },
   methods: {
@@ -186,6 +184,11 @@ export default {
           url: this.API.questionListData,
           noLoading: true,
           params: {
+            answerId: this.queryParams.answerId,
+            title: this.queryParams.title,
+            creator: this.queryParams.creator,
+            courseId: this.queryParams.courseId,
+            dateRange: this.queryParams.dateRange,
             page: this.currentPage,
             limit: this.pageSize
           },
@@ -201,8 +204,64 @@ export default {
         });
       }, 3000);
     },
-    test(row) {
-      console.log("tableRow", row);
+     //获取所有课程
+    getCourseInfo() {
+      this.$request.httpRequest({
+        method: "post",
+        url: this.API.getAllCourseInfo,
+        success: data => {
+          data.forEach(item => {
+          const course = {};
+          course.label = item.courseName;
+          course.value = item.id;
+          this.courseDict.push(course);
+        });
+        },
+
+      });
+    },
+
+    handleQuery() {
+      this.getData()
+    },
+
+    resetQuery() {
+      this.queryParams = {
+        answerId: undefined,
+        title: undefined,
+        creator: undefined,
+        courseId: undefined,
+        dateRange: []
+      }
+    },
+
+
+    deleteQuestion(questionId) {
+      this.$request.httpRequest({
+        method: "post",
+        url: this.API.deleteQuestion,
+        params: {
+          questionId: questionId
+        },
+        success: data => {
+          this.getData();
+          this.msgSuccess("删除成功");
+        },
+        error: e => {
+          this.msgError("删除失败");
+        }
+      });
+    },
+
+    handleDelete(row) {
+      const questionId = row.id;
+      this.$confirm("是否确认删除ID为:" + questionId + "的问题?", "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        this.deleteQuestion(questionId);
+      });
     }
   }
 };

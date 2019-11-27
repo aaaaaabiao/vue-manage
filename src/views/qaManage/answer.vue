@@ -1,13 +1,22 @@
 <template>
   <div class="table-demo">
+    <img src="https://img-blog.csdn.net/20170919221428421?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQveGRubG92ZW1l/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center" width="400">
     <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="68px">
-      <el-form-item label="问题" prop="userName">
+      <el-form-item label="答案ID" prop="questionId">
         <el-input
-          v-model="queryParams.title"
-          placeholder="请输入标题"
+          v-model="queryParams.questionId"
+          placeholder="请输入答案ID"
           clearable
           size="small"
-          style="width: 240px"
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
+      <el-form-item label="问题ID" prop="answerId">
+        <el-input
+          v-model="queryParams.answerId"
+          placeholder="请输入问题ID"
+          clearable
+          size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
@@ -17,18 +26,11 @@
           placeholder="请输入用户名称"
           clearable
           size="small"
-          style="width: 240px"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
       <el-form-item label="课程" prop="courseId">
-        <el-select
-          v-model="queryParams.courseId"
-          placeholder="课程"
-          clearable
-          size="small"
-          style="width: 240px"
-        >
+        <el-select v-model="queryParams.courseId" placeholder="课程" clearable size="small">
           <el-option
             v-for="course in courseDict"
             :key="course.value"
@@ -64,42 +66,6 @@
           style="width: 100%"
           class="table-content"
         >
-          <el-table-column type="expand">
-            <template slot-scope="props">
-              <el-form label-position="left" inline class="demo-table-expand">
-                <el-form-item label="问题ID">
-                  <span>{{ props.row.id }}</span>
-                </el-form-item>
-                <el-form-item label="标题">
-                  <span>{{ props.row.title }}</span>
-                </el-form-item>
-                <el-form-item label="描述">
-                  <span>{{ props.row.description }}</span>
-                </el-form-item>
-                <el-form-item label="课程">
-                  <span>{{ props.row.courseName }}</span>
-                </el-form-item>
-                <el-form-item label="用户名">
-                  <span>{{ props.row.userName }}</span>
-                </el-form-item>
-                <el-form-item label="创建时间">
-                  <span>{{ props.row.createTime }}</span>
-                </el-form-item>
-                <el-form-item label="回答数">
-                  <span>{{ props.row.answers}}</span>
-                </el-form-item>
-                <el-form-item label="关注数">
-                  <span>{{ props.row.followers }}</span>
-                </el-form-item>
-                <el-form-item label="收藏数">
-                  <span>{{ props.row.collections }}</span>
-                </el-form-item>
-                <el-form-item label="评论数">
-                  <span>{{ props.row.comments }}</span>
-                </el-form-item>
-              </el-form>
-            </template>
-          </el-table-column>
           <el-table-column type="index" label="序号" align="center" sortable width="50" />
           <el-table-column
             v-for="(item,index) in tableHeader"
@@ -111,7 +77,8 @@
           />
           <el-table-column label="操作" width="230" align="center" class-name="operation">
             <template slot-scope="scope">
-              <a v-if="$route.meta.delete" class="item" @click="test(scope.row)">删除</a>
+              <a v-if="$route.meta.delete" class="item" @click="handleDelete(scope.row)">删除</a>
+              <a v-if="$route.meta.delete" class="item" @click="detail(scope.row)">详情</a>
             </template>
           </el-table-column>
         </el-table>
@@ -132,29 +99,45 @@
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
+
+    <!-- 新增 -->
+    <el-dialog :title="title" :model="answerDetail" :visible.sync="open" width="800px">
+      <el-row>
+        <el-col :span="24">
+          <h2 style="text-align: center">{{answerDetail.questionTitle}}</h2>
+        </el-col>
+      </el-row>
+      <el-divider></el-divider>
+      <el-row>
+        <el-col :span="24">
+          <div v-html="answerDetail.questionDesc" style="text-align: center"></div>
+        </el-col>
+      </el-row>
+      <el-divider></el-divider>
+      <el-row>
+        <el-col :span="24">
+          <div v-html="answerDetail.content" style="text-align: center">{{answerDetail.content}}</div>
+        </el-col>
+      </el-row>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="deleteAnswer(answerDetail.answerId)">删除</el-button>
+        <el-button @click="cancel">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
 export default {
   data() {
     return {
-      queryParams: {
-        title: "",
-        creator: "",
-        courseId: undefined,
-        dateRange: []
-      },
-
-      courseDict: [
-        { label: "数据结构", value: 1 },
-        { label: "计算机组成原理", value: 2 },
-        { label: "操作系统", value: 3 },
-        { label: "计算机网络", value: 4 }
-      ],
+      open: false,
+      queryParams: {},
+      answerDetail: {},
+      courseDict: [],
       tableLoading: false,
       tableHeader: {
-        id: "ID",
-        title: "标题",
+        id: "答案ID",
+        title: "所属问题",
         courseName: "所属课程",
         userName: "创建人",
         createTime: "创建时间"
@@ -166,10 +149,27 @@ export default {
       total: 0
     };
   },
-  mounted() {
+  created() {
+    this.resetQuery();
+    this.getCourseInfo();
     this.getData();
   },
   methods: {
+    //获取所有课程
+    getCourseInfo() {
+      this.$request.httpRequest({
+        method: "post",
+        url: this.API.getAllCourseInfo,
+        success: data => {
+          data.forEach(item => {
+            const course = {};
+            course.label = item.courseName;
+            course.value = item.id;
+            this.courseDict.push(course);
+          });
+        }
+      });
+    },
     handleCurrentChange(val) {
       this.currentPage = val;
       this.getData();
@@ -183,9 +183,14 @@ export default {
       setTimeout(() => {
         this.$request.httpRequest({
           method: "post",
-          url: this.API.questionListData,
+          url: this.API.answerListData,
           noLoading: true,
           params: {
+            questionId: this.queryParams.questionId,
+            answerId: this.queryParams.answerId,
+            creator: this.queryParams.creator,
+            courseId: this.queryParams.courseId,
+            dateRange: this.queryParams.dateRange,
             page: this.currentPage,
             limit: this.pageSize
           },
@@ -201,8 +206,73 @@ export default {
         });
       }, 3000);
     },
-    test(row) {
-      console.log("tableRow", row);
+
+    handleQuery() {
+      this.getData();
+    },
+
+    resetQuery() {
+      this.queryParams = {
+        questionId: undefined,
+        answerId: undefined,
+        creator: undefined,
+        courseId: undefined,
+        dateRange: []
+      };
+    },
+
+    deleteAnswer(answerId) {
+      this.$request.httpRequest({
+        method: "post",
+        url: this.API.deleteAnswer,
+        params: {
+          answerId: answerId
+        },
+        success: data => {
+          this.open = false;
+          this.getData();
+          this.msgSuccess("删除成功");
+        },
+        error: e => {
+          this.open = false;
+          this.msgError("删除失败");
+        }
+      });
+    },
+
+    handleDelete(row) {
+      const answerId = row.id;
+      this.$confirm("是否确认删除ID为:" + answerId + "的问题?", "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        this.deleteAnswer(answerId);
+      });
+    },
+
+    detail(row) {
+      this.open = true;
+      const answerId = row.id;
+      this.$request.httpRequest({
+        method: "post",
+        url: this.API.selectAnswer,
+        params: {
+          answerId: answerId
+        },
+        success: data => {
+          this.answerDetail = {
+            answerId: data.answerId,
+            questionTitle: data.questionTitle,
+            questionDesc: data.questionDesc,
+            content: data.content
+          };
+        }
+      });
+    },
+
+    cancel() {
+      this.open = false;
     }
   }
 };

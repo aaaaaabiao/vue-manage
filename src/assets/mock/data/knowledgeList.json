@@ -1,5 +1,6 @@
 [
     {
+        "knowledgeId" : 123,
         "knowledgeName" : "线性表",
         "weight" : 0.8,
         "creator" : "admin",

@@ -10,8 +10,8 @@ import knowledgeList from './data/knowledgeList.json'
 const Random = Mock.Random
 const result = {
   data: {},
-  resultCode: 1,
-  resultMessage: 'success'
+  status: 1,
+  message: 'success'
 }
 
 const courseChapterData = () => {
@@ -67,7 +67,7 @@ const courseChapterTreeData = () => {
 const knowledgeListData = () => {
   // json文件数据
   const data = {
-    data: courseChapterTree
+    data: knowledgeList
   }
 
   //   // 随机数据
@@ -88,6 +88,44 @@ const knowledgeListData = () => {
   result.data = data
   return result
 }
+// 添加课程
+const addCourse = () => {
+  result.data = {}
+  return result
+}
+// 添加章节
+const addChapter = () => {
+  result.data = {}
+  return result
+}
+// 更新章节
+const updateChapter = () => {
+  result.data = {}
+  return result
+}
+// 根据chapterId选择章节
+const selectChapter = () => {
+  result.data = {
+    chapterId: 123,
+    chapterName: '第二章',
+    orderNum: 1,
+    weight: 0.5,
+    parentId: 100
+  }
+  return result
+}
+
+// 删除章节
+const deleteChapter = () => {
+  result.data = {}
+  return result
+}
 Mock.mock('/apiReplace/courseChapterData', 'post', courseChapterData)
 Mock.mock('/apiReplace/courseChapterTreeData', 'post', courseChapterTreeData)
 Mock.mock('/apiReplace/knowledgeListData', 'post', knowledgeListData)
+Mock.mock('/apiReplace/addCourse', 'post', addCourse)
+
+Mock.mock('/apiReplace/addChapter', 'post', addChapter)
+Mock.mock('/apiReplace/updateChapter', 'post', updateChapter)
+Mock.mock('/apiReplace/selectChapter', 'post', selectChapter)
+Mock.mock('/apiReplace/deleteChapter', 'post', deleteChapter)

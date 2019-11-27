@@ -12,8 +12,8 @@ import CourseManage from './courseManage'
 const Random = Mock.Random
 const result = {
   data: {},
-  resultCode: 1,
-  resultMessage: 'success'
+  status: 1,
+  message: 'success'
 }
 // 登陆接口
 const loginData = () => {
