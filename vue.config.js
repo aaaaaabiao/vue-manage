@@ -17,7 +17,7 @@ module.exports = {
         target: 'http://127.0.0.1:8080', // 后端提供的接口地址
         changOrigin: false,
         pathRewrite: {
-          '^/apiReplace': ''
+          '^/apiReplace': '/manage'
         }
       }
     } // 设置代理
