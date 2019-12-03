@@ -26,7 +26,7 @@
           v-model="queryParams.dateRange"
           size="small"
           style="width: 240px"
-          value-format="yyyy-MM-dd"
+          value-format="yyyy-MM-dd HH:mm:ss"
           type="daterange"
           range-separator="-"
           start-placeholder="开始日期"
@@ -121,8 +121,8 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="角色" prop="role">
-              <el-select v-model="addAdminform.role" :placeholder="请选择角色" style="width:100%;">
+            <el-form-item label="角色" prop="type">
+              <el-select v-model="addAdminform.type" :placeholder="请选择角色" style="width:100%;">
                 <el-option
                   v-for="item in roleDict"
                   :key="item.value"
@@ -132,7 +132,7 @@
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="12" v-if="this.addAdminform.role == 3 || this.addAdminform.role == 4">
+          <el-col :span="12" v-if="this.addAdminform.type == 3 || this.addAdminform.type == 4">
             <el-form-item label="课程">
               <el-select v-model="addAdminform.courseId" :placeholder="请选择对应课程" style="width:100%;">
                 <el-option
@@ -174,10 +174,10 @@ export default {
       },
       open: false,
       queryParams: {
-        userId: "",
-        userName: "",
+        userId: undefined,
+        userName: undefined,
         roleId: undefined,
-        dateRange: []
+        dateRange: undefined
       },
 
       roleDict: this.COMMON.roleDict,
@@ -245,12 +245,12 @@ export default {
         userId: undefined,
         username: undefined,
         password: undefined,
-        role: undefined,
+        type: undefined,
         courseId: undefined
       };
     },
     handleAdd() {
-      this.getCourseInfo()
+      this.getCourseInfo();
       this.reset();
       this.open = true;
       this.title = "添加管理员";
@@ -262,7 +262,7 @@ export default {
 
     //修改
     handleUpdate(row) {
-      this.getCourseInfo()
+      this.getCourseInfo();
       const userId = row.id;
       this.$request.httpRequest({
         method: "post",
@@ -271,8 +271,14 @@ export default {
           userId: userId
         },
         success: data => {
-          this.addAdminform = data;
-          this.title = "修改管理员";
+          (this.addAdminform = {
+            userId: data.id,
+            username: data.username,
+            password: data.password,
+            type: data.type,
+            courseId: data.courseId
+          }),
+            (this.title = "修改管理员");
           this.open = true;
         }
       });
@@ -314,23 +320,26 @@ export default {
 
     //获取所有课程
     getCourseInfo() {
+      this.courses = []
       this.$request.httpRequest({
         method: "post",
         url: this.API.getAllCourseInfo,
         success: data => {
           data.forEach(item => {
-          const course = {};
-          course.label = item.courseName;
-          course.value = item.id;
-          this.courses.push(course);
-        });
-        },
-
+            const course = {};
+            course.label = item.courseName;
+            course.value = item.id;
+            this.courses.push(course);
+          });
+        }
       });
     },
 
     //更新管理员信息
     updateUser() {
+      if(this.addAdminform.type != 3 || his.addAdminform.type != 4) {
+        this.addAdminform.courseId = -1
+      }
       this.$request.httpRequest({
         method: "post",
         url: this.API.updateAdmin,
@@ -341,7 +350,7 @@ export default {
           this.getData();
         },
         error: e => {
-          this.open = false
+          this.open = false;
           this.msgError("修改失败");
         }
       });
@@ -359,12 +368,11 @@ export default {
           this.getData();
         },
         error: e => {
-          this.open = false
+          this.open = false;
           this.msgError("添加失败");
         }
       });
     },
-
 
     //提交表单
     submitForm() {
@@ -381,9 +389,9 @@ export default {
 
     resetQuery() {
       this.queryParams = {
-        userId: "",
-        userName: "",
-        dateRange: [],
+        userId: undefined,
+        userName: undefined,
+        dateRange: undefined,
         roleId: undefined
       };
     }

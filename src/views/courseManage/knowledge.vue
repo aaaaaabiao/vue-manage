@@ -34,7 +34,7 @@
       </el-col>
       <!--用户数据-->
       <el-col :span="18" :xs="24">
-        <el-row :gutter="10" class="mb10">
+        <el-row :gutter="10" class="mb10" v-if="this.queryParams.type == 3">
           <el-col :span="1.5">
             <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAdd">添加知识点</el-button>
           </el-col>
@@ -42,14 +42,14 @@
 
         <el-table
           v-loading="loading"
-          :data="knowledgeList"
+          :data="knowledgeList.slice((currentPage-1)*pagesize,currentPage*pagesize)"
           @selection-change="handleSelectionChange"
           row-key="knowledgeId"
         >
-          <el-table-column label="知识点" align="center" prop="knowledgeName" />
+          <el-table-column label="知识点" align="center" prop="title" />
           <el-table-column label="权重" align="center" prop="weight" />
           <el-table-column label="创建人" align="center" prop="creator" />
-          <el-table-column label="创建时间" align="center" prop="createTime" width="160"></el-table-column>
+          <el-table-column label="创建时间" align="center" prop="createdTime" width="160"></el-table-column>
           <el-table-column
             label="操作"
             align="center"
@@ -73,13 +73,16 @@
             </template>
           </el-table-column>
         </el-table>
-        <pagination
-          v-show="total>0"
+        <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="currentPage"
+          :page-sizes="[10, 20, 30, 40]"
+          :page-size="1"
+          background
+          layout="total, sizes, prev, pager, next, jumper"
           :total="total"
-          :page.sync="queryParams.pageNum"
-          :limit.sync="queryParams.pageSize"
-          @pagination="getList"
-        />
+        ></el-pagination>
       </el-col>
     </el-row>
     <!-- 添加或修改部门对话框 -->
@@ -87,8 +90,8 @@
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-row>
           <el-col :span="12">
-            <el-form-item label="知识点" prop="knowledgePoint">
-              <el-input v-model="form.knowledgePoint" placeholder="请输入部门名称" />
+            <el-form-item label="知识点" prop="chapterName">
+              <el-input v-model="form.chapterName" placeholder="请输入知识点" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -116,13 +119,14 @@
 export default {
   data() {
     return {
+      pagesize: 10,
+      total: 3,
+      currentPage: 1,
       open: false,
       courseDict: [],
       // 遮罩层
       loading: true,
 
-      // 总条数
-      total: 0,
       // 用户表格数据
       knowledgeList: [],
       // 弹出层标题
@@ -136,20 +140,19 @@ export default {
       form: {},
       defaultProps: {
         children: "children",
-        label: "label"
+        label: "title"
       },
       // 查询参数
       queryParams: {
         chapterId: undefined,
-        pageNum: 1,
-        pageSize: 10
+        type: undefined
       },
       // 表单校验
       rules: {
         knowledgePoint: [
           { required: true, message: "知识点不能为空", trigger: "blur" }
         ],
-        weigth: [{ required: true, message: "权重不能为空", trigger: "blur" }]
+        weight: [{ required: true, message: "权重不能为空", trigger: "blur" }]
       }
     };
   },
@@ -184,40 +187,50 @@ export default {
 
     /** 查询知识点列表 */
     getList() {
-      this.loading = true;
-      this.$request.httpRequest({
-        method: "post",
-        url: this.API.knowledgeListData,
-        params: this.queryParams,
-        success: data => {
-          console.log(data, data);
-          this.loading = false
-          this.knowledgeList = data.data;
-        },
-      });
+      if (this.queryParams.chapterId != undefined) {
+        console.log(this.queryParams.chapterId);
+        this.loading = true;
+        this.$request.httpRequest({
+          method: "post",
+          url: this.API.knowledgeListData,
+          params: this.queryParams,
+          success: data => {
+            console.log(data, data);
+            this.loading = false;
+            this.knowledgeList = data;
+            this.total = data.length
+          },
+          error: e => {
+            this.loading = false;
+          }
+        });
+      }
+
+      this.loading = false;
     },
     /** 查询课程下拉树 */
     getTreeselect() {
       this.$request.httpRequest({
         method: "post",
-        url: this.API.courseChapterTreeData,
+        url: this.API.courseChapterData,
         params: {
           courseId: this.courseId
         },
         success: data => {
           console.log(data, data);
-          this.chapterTree = data.data;
+          this.chapterTree = data;
         }
       });
     },
-    // 筛选节点
-    filterNode(value, data) {
-      if (!value) return true;
-      return data.label.indexOf(value) !== -1;
-    },
+    // // 筛选节点
+    // filterNode(value, data) {
+    //   if (!value) return true;
+    //   return data.label.indexOf(value) !== -1;
+    // },
     // 节点单击事件
     handleNodeClick(data) {
       this.queryParams.chapterId = data.id;
+      this.queryParams.type = data.type
       this.getList();
     },
 
@@ -235,10 +248,11 @@ export default {
     // 表单重置
     reset() {
       this.form = {
-        knowledgeId: undefined,
-        knowledgePoint: undefined,
+        chapterName: undefined,
+        parentId: undefined,
+        orderNum: undefined,
         weight: undefined,
-        parentId: undefined
+        
       };
       this.resetForm("form");
     },
@@ -247,6 +261,7 @@ export default {
     handleAdd(row) {
       this.reset();
       this.form.parentId = this.queryParams.chapterId;
+      console.log(this.form.parentId)
       this.open = true;
       this.title = "添加知识点";
     },
@@ -254,17 +269,17 @@ export default {
     /** 修改章节 */
     handleUpdate(row) {
       this.reset();
-      const knowledgeId = row.knowledgeId;
+      const knowledgeId = row.id;
       this.$request.httpRequest({
         method: "post",
         url: this.API.selectChapter,
         params: {
-          knowledgeId: knowledgeId
+          chapterId: knowledgeId
         },
         success: data => {
           this.form = {
-            knowledgeId: data.chapterId,
-            knowledgePoint: data.chapterName,
+            chapterId: data.id,
+            chapterName: data.title,
             weight: data.weight,
             parentId: data.parentId
           };
@@ -314,7 +329,7 @@ export default {
     submitForm: function() {
       this.$refs["form"].validate(valid => {
         if (valid) {
-          if (this.form.knowledgeId != undefined) {
+          if (this.form.chapterId != undefined) {
             this.updateknowledge();
           } else {
             this.insertKnowledge();
@@ -324,8 +339,8 @@ export default {
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      const knowledgeId = row.knowledgeId;
-      const knowledgeName = row.knowledgeName;
+      const knowledgeId = row.id;
+      const knowledgeName = row.title;
       this.$confirm('是否确认删除知识点"' + knowledgeName + "?", "警告", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -340,7 +355,8 @@ export default {
         method: "post",
         url: this.API.deleteChapter,
         params: {
-          chapterId: chapterId
+          chapterId: chapterId,
+          type : 4
         },
         success: data => {
           this.getList();
@@ -354,6 +370,14 @@ export default {
 
     courseChange(val) {
       this.getTreeselect();
+      this.getList()
+    },
+
+    handleSizeChange(val) {
+      this.pagesize = val;
+    },
+    handleCurrentChange(val) {
+      this.currentPage = val;
     }
   }
 };

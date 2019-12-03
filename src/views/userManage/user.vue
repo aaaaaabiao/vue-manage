@@ -26,7 +26,7 @@
           v-model="queryParams.dateRange"
           size="small"
           style="width: 240px"
-          value-format="yyyy-MM-dd"
+          value-format="yyyy-MM-dd HH:mm:ss"
           type="daterange"
           range-separator="-"
           start-placeholder="开始日期"
@@ -88,9 +88,9 @@ export default {
   data() {
     return {
       queryParams: {
-        userId: "",
-        userName: "",
-        dateRange: []
+        userId: undefined,
+        userName: undefined,
+        dateRange: undefined
       },
       tableLoading: false,
       tableHeader: {
@@ -150,16 +150,16 @@ export default {
 
     resetQuery() {
       this.queryParams = {
-        userId: "",
-        userName: "",
-        dateRange: []
+        userId: undefined,
+        userName: undefined,
+        dateRange: undefined
       };
     },
 
     deleteUserByUserId(userId) {
       this.$request.httpRequest({
           method: "post",
-          url: this.API.userData,
+          url: this.API.deleteUser,
           params: {
             userId: userId
           },

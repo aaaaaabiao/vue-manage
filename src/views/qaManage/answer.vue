@@ -1,20 +1,28 @@
 <template>
   <div class="table-demo">
-    <img src="https://img-blog.csdn.net/20170919221428421?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQveGRubG92ZW1l/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center" width="400">
     <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="68px">
-      <el-form-item label="答案ID" prop="questionId">
+      <el-form-item label="答案ID" prop="answerId">
         <el-input
-          v-model="queryParams.questionId"
+          v-model="queryParams.answerId"
           placeholder="请输入答案ID"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="问题ID" prop="answerId">
+      <el-form-item label="问题ID" prop="questionId">
         <el-input
-          v-model="queryParams.answerId"
+          v-model="queryParams.questionId"
           placeholder="请输入问题ID"
+          clearable
+          size="small"
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
+      <el-form-item label="问题标题" prop="questionTitle">
+        <el-input
+          v-model="queryParams.questionTitle"
+          placeholder="请输入问题标题"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
@@ -29,22 +37,12 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="课程" prop="courseId">
-        <el-select v-model="queryParams.courseId" placeholder="课程" clearable size="small">
-          <el-option
-            v-for="course in courseDict"
-            :key="course.value"
-            :label="course.label"
-            :value="course.value"
-          />
-        </el-select>
-      </el-form-item>
       <el-form-item label="创建时间">
         <el-date-picker
           v-model="queryParams.dateRange"
           size="small"
           style="width: 240px"
-          value-format="yyyy-MM-dd"
+          value-format="yyyy-MM-dd HH:mm:ss"
           type="daterange"
           range-separator="-"
           start-placeholder="开始日期"
@@ -137,7 +135,8 @@ export default {
       tableLoading: false,
       tableHeader: {
         id: "答案ID",
-        title: "所属问题",
+        questionId: "问题ID",
+        questionTitle: "所属问题",
         courseName: "所属课程",
         userName: "创建人",
         createTime: "创建时间"
@@ -187,9 +186,9 @@ export default {
           noLoading: true,
           params: {
             questionId: this.queryParams.questionId,
+            questionTitle: this.queryParams.questionTitle,
             answerId: this.queryParams.answerId,
             creator: this.queryParams.creator,
-            courseId: this.queryParams.courseId,
             dateRange: this.queryParams.dateRange,
             page: this.currentPage,
             limit: this.pageSize
@@ -214,10 +213,10 @@ export default {
     resetQuery() {
       this.queryParams = {
         questionId: undefined,
+        questionTitle: undefined,
         answerId: undefined,
         creator: undefined,
-        courseId: undefined,
-        dateRange: []
+        dateRange: undefined
       };
     },
 
@@ -262,7 +261,7 @@ export default {
         },
         success: data => {
           this.answerDetail = {
-            answerId: data.answerId,
+            answerId: data.id,
             questionTitle: data.questionTitle,
             questionDesc: data.questionDesc,
             content: data.content

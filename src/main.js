@@ -9,7 +9,7 @@ import 'normalize.css/normalize.css' // A modern alternative to CSS resets
 import '@/styles/index.scss' // global css
 import 'element-ui/lib/theme-chalk/index.css'
 import '@/icons' // icon
-import '@/assets/mock'
+// import '@/assets/mock'
 import '@/permission' // permission control
 import 'lib-flexible' // 使用lib-flexible来解决移动端适配
 // 解决低版本浏览器不支持promise问题
@@ -20,6 +20,7 @@ Es6Promise.polyfill()
 import Api from '@/assets/http/apiUrl'
 import Request from '@/assets/http'
 import Common from './components/common'
+import parseTime from '@/assets/utils'
 Vue.config.productionTip = false
 Vue.use(ElementUI, {
   locale
@@ -27,6 +28,7 @@ Vue.use(ElementUI, {
 Vue.prototype.API = Api
 Vue.prototype.$request = Request
 Vue.prototype.COMMON = Common
+Vue.prototype.parseTime = parseTime
 Vue.prototype.msgSuccess = function(msg) {
   this.$message({ showClose: true, message: msg, type: 'success' })
 }

@@ -32,19 +32,26 @@
     <el-table
       v-loading="tableLoading"
       :data="courseChapterList"
-      row-key="chapterId"
+      row-key="id"
+      default-expand-all
       :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
     >
-      <el-table-column prop="chapterName" label="课程/章节" width="200"></el-table-column>
+      <el-table-column prop="title" label="课程/章节" width="200"></el-table-column>
       <el-table-column prop="type" label="类型" width="200"></el-table-column>
       <el-table-column prop="orderNum" label="排序" width="200"></el-table-column>
       <el-table-column prop="creator" label="创建人" width="200"></el-table-column>
-      <el-table-column label="创建时间" align="center" prop="createTime" width="200"></el-table-column>
+      <el-table-column label="创建时间" align="center" prop="createdTime" width="200"></el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)">修改</el-button>
           <el-button
-            v-if="scope.row.type !== '小节'"
+            v-if="scope.row.type !== 1"
+            size="mini"
+            type="text"
+            icon="el-icon-edit"
+            @click="handleUpdate(scope.row)"
+          >修改</el-button>
+          <el-button
+            v-if="scope.row.type !== 3"
             size="mini"
             type="text"
             icon="el-icon-plus"
@@ -66,8 +73,8 @@
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-row>
           <el-col :span="12">
-            <el-form-item label="章节名" prop="chapterName">
-              <el-input v-model="form.chapterName" placeholder="请输入部门名称" />
+            <el-form-item label="章节名" prop="title">
+              <el-input v-model="form.title" placeholder="请输入章节名称" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -154,12 +161,13 @@ export default {
           method: "post",
           url: this.API.courseChapterData,
           params: {
-            courseId: this.queryParams.chapterId
+            courseId: this.queryParams.courseId
           },
           noLoading: true,
           success: data => {
             console.log(data, data);
-            this.courseChapterList = data.data;
+            this.courseChapterList = data;
+
             this.tableLoading = false;
           },
           error: e => {
@@ -213,7 +221,7 @@ export default {
     //添加章节
     addChapter(row) {
       this.reset();
-      this.form.parentId = row.chapterId;
+      this.form.parentId = row.id;
       this.open = true;
       this.title = "添加课程/章节";
     },
@@ -221,7 +229,7 @@ export default {
     /** 修改章节 */
     handleUpdate(row) {
       this.reset();
-      const chapterId = row.chapterId;
+      const chapterId = row.id;
       this.$request.httpRequest({
         method: "post",
         url: this.API.selectChapter,
@@ -249,6 +257,9 @@ export default {
             course.value = item.id;
             this.courseDict.push(course);
           });
+        },
+        error: e => {
+          this.msgError("获取课程信息失败");
         }
       });
     },
@@ -271,7 +282,7 @@ export default {
             },
             error: e => {
               this.addCourseOpen = false;
-              this.msgSuccess("添加失败");
+              this.msgError("添加失败");
             }
           });
         }
@@ -283,7 +294,11 @@ export default {
       this.$request.httpRequest({
         method: "post",
         url: this.API.updateChapter,
-        params: this.form,
+        params: {
+          chapterName: this.form.title,
+          chapterId: this.form.id,
+          orderNum: this.form.orderNum
+        },
         success: data => {
           this.msgSuccess("修改成功");
           this.open = false;
@@ -301,7 +316,11 @@ export default {
       this.$request.httpRequest({
         method: "post",
         url: this.API.addChapter,
-        params: this.form,
+        params: {
+          chapterName: this.form.title,
+          parentId: this.form.parentId,
+          orderNum: this.form.orderNum
+        },
         success: data => {
           this.msgSuccess("添加成功");
           this.open = false;
@@ -318,7 +337,7 @@ export default {
     submitForm() {
       this.$refs.form.validate(valid => {
         if (valid) {
-          if (this.form.chapterId != undefined) {
+          if (this.form.id != undefined) {
             this.updateChapter();
           } else {
             this.insertChapter();
@@ -327,15 +346,17 @@ export default {
       });
     },
 
-    deleteChapter(chapterId) {
+    deleteChapter(chapterId, type) {
       this.$request.httpRequest({
         method: "post",
         url: this.API.deleteChapter,
         params: {
-          chapterId: chapterId
+          chapterId: chapterId,
+          type: type
         },
         success: data => {
           this.getList();
+          this.getCourseInfo();
           this.msgSuccess("删除成功");
         },
         error: e => {
@@ -345,15 +366,15 @@ export default {
     },
 
     handleDelete(row) {
-      const chapterName = row.chapterName;
-      const chapterId = row.chapterId;
+      const chapterName = row.title;
+      const chapterId = row.id;
       const type = row.type;
       this.$confirm("是否确认删除:" + type + "-" + chapterName + "?", "警告", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
       }).then(() => {
-        this.deleteChapter(chapterId);
+        this.deleteChapter(chapterId, type);
       });
     }
   }

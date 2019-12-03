@@ -12,7 +12,7 @@ import CourseManage from './courseManage'
 const Random = Mock.Random
 const result = {
   data: {},
-  status: 1,
+  resultCode: 1,
   message: 'success'
 }
 // 登陆接口

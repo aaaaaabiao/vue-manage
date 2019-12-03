@@ -5,6 +5,7 @@ import Mock from 'mockjs'
 // import util from './util'
 // 获取 mock.Random 对象
 import questionList from './data/questionList.json'
+import answerList from './data/answerList.json'
 import answerDetail from './data/answerDetail.json'
 const Random = Mock.Random
 const result = {
@@ -38,6 +39,8 @@ const questionListData = () => {
   result.data = data
   return result
 }
+
+
 
 const getAllCourseInfo = () => {
   result.data = [

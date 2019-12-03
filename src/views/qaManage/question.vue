@@ -1,9 +1,9 @@
 <template>
   <div class="table-demo">
     <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="68px">
-      <el-form-item label="问题ID" prop="answerId">
+      <el-form-item label="问题ID" prop="questionId">
         <el-input
-          v-model="queryParams.answerId"
+          v-model="queryParams.questionId"
           placeholder="请输入问题ID"
           clearable
           size="small"
@@ -49,7 +49,7 @@
           v-model="queryParams.dateRange"
           size="small"
           style="width: 240px"
-          value-format="yyyy-MM-dd"
+          value-format="yyyy-MM-dd HH:mm:ss"
           type="daterange"
           range-separator="-"
           start-placeholder="开始日期"
@@ -166,6 +166,7 @@ export default {
   mounted() {
     this.resetQuery()
     this.getData();
+    this.getCourseInfo()
   },
   methods: {
     handleCurrentChange(val) {
@@ -184,7 +185,7 @@ export default {
           url: this.API.questionListData,
           noLoading: true,
           params: {
-            answerId: this.queryParams.answerId,
+            questionId: this.queryParams.questionId,
             title: this.queryParams.title,
             creator: this.queryParams.creator,
             courseId: this.queryParams.courseId,
@@ -227,7 +228,7 @@ export default {
 
     resetQuery() {
       this.queryParams = {
-        answerId: undefined,
+        questionId: undefined,
         title: undefined,
         creator: undefined,
         courseId: undefined,

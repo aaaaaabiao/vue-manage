@@ -17,7 +17,7 @@ const GetTableData = `${apiHost}table`
 // 用户数据
 const userData = `${apiHost}userData`
 // 删除学生用户
-const deleteUser = `${apiHost}deleteUser`
+const deleteUser = `${apiHost}deleteStudent`
  
 // 管理员数据
 const adminData = `${apiHost}adminData`
@@ -34,7 +34,7 @@ const selectAdminByID = `${apiHost}selectAdminByID`
 // 问题数据
 const questionListData = `${apiHost}questionListData`
 const deleteQuestion = `${apiHost}deleteQuestion`
-const answerListData = `${apiHost}questionListData`
+const answerListData = `${apiHost}answerListData`
 const deleteAnswer = `${apiHost}deleteAnswer`
 
 const selectAnswer = `${apiHost}selectAnswer`
