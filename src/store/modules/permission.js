@@ -27,6 +27,7 @@ const permission = {
       resetRouter() // 先初始化路由
       return new Promise((resolve, reject) => {
         // 如果是超级管理员,挂载全部路由全部权限
+        // eslint-disable-next-line no-constant-condition
         if (isSuperAdmin) {
           // 重定向404的匹配规则需要在整个完整路由定义的最后面，否则刷新会出错。
           const accessedRoutes = [...asyncRoutes, ...notFoundRoutes]

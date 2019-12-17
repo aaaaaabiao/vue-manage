@@ -203,7 +203,7 @@ export default {
             this.tableLoading = false;
           }
         });
-      }, 3000);
+      }, 500);
     },
      //获取所有课程
     getCourseInfo() {

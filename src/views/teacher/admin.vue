@@ -234,7 +234,7 @@ export default {
             this.tableLoading = false;
           }
         });
-      }, 500);
+      }, 3000);
     },
     test(row) {
       console.log("tableRow", row);

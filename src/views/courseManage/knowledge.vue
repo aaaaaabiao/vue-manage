@@ -34,7 +34,7 @@
       </el-col>
       <!--用户数据-->
       <el-col :span="18" :xs="24">
-        <el-row :gutter="10" class="mb10" v-if="this.queryParams.type == 3">
+        <el-row :gutter="10" class="mb10">
           <el-col :span="1.5">
             <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAdd">添加知识点</el-button>
           </el-col>
@@ -85,7 +85,6 @@
         ></el-pagination>
       </el-col>
     </el-row>
-    <!-- 添加或修改部门对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="600px">
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-row>
@@ -217,7 +216,7 @@ export default {
           courseId: this.courseId
         },
         success: data => {
-          console.log(data, data);
+          console.log(data);
           this.chapterTree = data;
         }
       });
@@ -299,6 +298,7 @@ export default {
           this.msgSuccess("修改成功");
           this.open = false;
           this.getList();
+          this.getTreeselect();
         },
         error: e => {
           this.open = false;
@@ -317,6 +317,7 @@ export default {
           this.msgSuccess("添加成功");
           this.open = false;
           this.getList();
+          this.getTreeselect();
         },
         error: e => {
           this.open = false;
@@ -334,7 +335,10 @@ export default {
           } else {
             this.insertKnowledge();
           }
+          
         }
+        
+        
       });
     },
     /** 删除按钮操作 */

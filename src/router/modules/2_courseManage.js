@@ -7,14 +7,14 @@ const courseManage = {
     title: '课程管理'
   },
   children: [
-    {
-      path: '/course/chapter',
-      name: 'chapter',
-      component: resolve => void require(['@/views/courseManage/chapter'], resolve),
-      meta: {
-        title: '章节管理'
-      }
-    },
+    // {
+    //   path: '/course/chapter',
+    //   name: 'chapter',
+    //   component: resolve => void require(['@/views/courseManage/chapter'], resolve),
+    //   meta: {
+    //     title: '章节管理'
+    //   }
+    // },
     {
       path: '/course/knowledge',
       name: 'knowledge',
