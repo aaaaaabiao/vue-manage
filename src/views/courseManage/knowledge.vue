@@ -3,7 +3,7 @@
     <el-row :gutter="20">
       <!--部门数据-->
       <el-col :span="5" :xs="24">
-        <div class="head-container">
+        <!-- <div class="head-container">
           <el-select
             v-model="courseId"
             placeholder="课程"
@@ -19,7 +19,7 @@
               :value="course.value"
             />
           </el-select>
-        </div>
+        </div> -->
         <div class="head-container">
           <el-tree
             :data="chapterTree"
@@ -212,9 +212,6 @@ export default {
       this.$request.httpRequest({
         method: "post",
         url: this.API.courseChapterData,
-        params: {
-          courseId: this.courseId
-        },
         success: data => {
           console.log(data);
           this.chapterTree = data;

@@ -22,14 +22,6 @@ const userManage = {
       meta: {
         title: '答案管理'
       }
-    },
-    {
-      path: '/qa/add',
-      name: 'answer',
-      component: resolve => void require(['@/views/qaManage/answer'], resolve),
-      meta: {
-        title: '添加问答数据'
-      }
     }
   ]
 }

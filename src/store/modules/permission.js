@@ -7,7 +7,7 @@
 import { asyncRoutes, constantRoutes, notFoundRoutes, resetRouter } from '@/router'
 import API from '@/assets/http/apiUrl'
 import Request from '@/assets/http'
-
+import store from '@/store'
 const permission = {
   state: {
     routes: [],
@@ -52,11 +52,10 @@ const permission = {
             method: 'post',
             url: API.GetPermissionData,
             noLoading: true,
-            params: {},
             success: (data) => {
               console.log(data)
               let accessedRoutes = []
-              // 匹配前端路由和后台返回的菜单
+              // 匹配前端路由和后台返回的菜单`
               accessedRoutes = filterAsyncRoutes(asyncRoutes, data)
               // 重定向404的匹配规则需要在整个完整路由定义的最后面，否则刷新会出错。
               accessedRoutes.push(...notFoundRoutes)

@@ -20,7 +20,7 @@ const userManage = {
       name: 'adminUser',
       component: resolve => void require(['@/views/userManage/admin'], resolve),
       meta: {
-        title: '管理员用户'
+        title: '其他用户'
       }
     }
   ]
