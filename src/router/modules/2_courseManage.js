@@ -25,7 +25,7 @@ const courseManage = {
     },
     {
       path: '/course/teacher',
-      name: 'courseteacher',
+      name: 'teacher',
       component: resolve => void require(['@/views/courseManage/teacher'], resolve),
       meta: {
         title: '任课教师管理'

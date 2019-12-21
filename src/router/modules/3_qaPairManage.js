@@ -12,7 +12,15 @@ const qaPairManage = {
       name: 'checkQa',
       component: resolve => void require(['@/views/teacher/checkQa'], resolve),
       meta: {
-        title: '审核问答对'
+        title: '审核讨论区问答对'
+      }
+    },
+    {
+      path: '/qaPair/unSolveQuestion',
+      name: 'unSolveQuestion',
+      component: resolve => void require(['@/views/teacher/unSolveQuestion'], resolve),
+      meta: {
+        title: '待回答问题'
       }
     },
     {

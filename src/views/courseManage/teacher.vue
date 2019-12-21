@@ -33,22 +33,6 @@
           end-placeholder="结束日期"
         ></el-date-picker>
       </el-form-item>
-      <el-form-item label="角色" prop="role">
-        <el-select
-          v-model="queryParams.roleId"
-          placeholder="角色"
-          clearable
-          size="small"
-          style="width: 240px"
-        >
-          <el-option
-            v-for="role in roleDict"
-            :key="role.value"
-            :label="role.label"
-            :value="role.value"
-          />
-        </el-select>
-      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -118,30 +102,6 @@
           <el-col :span="12">
             <el-form-item label="密码" prop="password">
               <el-input v-model="addAdminform.password" placeholder="请输入密码" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="角色" prop="type">
-              <el-select v-model="addAdminform.type" :placeholder="请选择角色" style="width:100%;">
-                <el-option
-                  v-for="item in roleDict"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12" v-if="this.addAdminform.type == 3 || this.addAdminform.type == 4">
-            <el-form-item label="课程">
-              <el-select v-model="addAdminform.courseId" :placeholder="请选择对应课程" style="width:100%;">
-                <el-option
-                  v-for="item in courses"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
             </el-form-item>
           </el-col>
         </el-row>
@@ -224,7 +184,7 @@ export default {
             userName: this.queryParams.userName,
             dateRange: this.queryParams.dateRange,
             role: this.queryParams.roleId,
-            roles: [2, 3],
+            roles: [4],
             page: this.currentPage,
             limit: this.pageSize
           },
@@ -249,15 +209,13 @@ export default {
         userId: undefined,
         username: undefined,
         password: undefined,
-        type: undefined,
-        courseId: undefined
       };
     },
     handleAdd() {
       this.getCourseInfo();
       this.reset();
       this.open = true;
-      this.title = "添加人员";
+      this.title = "添加任课教师";
     },
     //取消按钮
     cancel() {
@@ -279,10 +237,8 @@ export default {
             userId: data.id,
             username: data.username,
             password: data.password,
-            type: data.type,
-            courseId: data.courseId
           }),
-            (this.title = "修改人员");
+            (this.title = "修改任课教师");
           this.open = true;
         }
       });
@@ -341,9 +297,6 @@ export default {
 
     //更新管理员信息
     updateUser() {
-      if(this.addAdminform.type != 3 && this.addAdminform.type != 4) {
-        this.addAdminform.courseId = -1
-      }
       this.$request.httpRequest({
         method: "post",
         url: this.API.updateAdmin,

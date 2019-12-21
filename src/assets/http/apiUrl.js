@@ -50,6 +50,13 @@ const updateChapter = `${apiHost}updateChapter`
 const selectChapter = `${apiHost}selectChapter`
 const deleteChapter = `${apiHost}deleteChapter`
 
+//待完善
+const getCqaQuestion = `${apiHost}getCqaQuestion`
+const getCqaQuestionDetail = `${apiHost}getCqaQuestionDetail`
+const addQa = `${apiHost}addQa`
+const getUnsolveQuestion = `${apiHost}getUnsolveQuestion`
+const getUnsloveQuestionDetail = `${apiHost}getUnsloveQuestionDetail`
+const QaList = `${apiHost}QaList`
 export default {
   Login,
   LoginByVin,
@@ -76,5 +83,11 @@ export default {
   deleteQuestion,
   answerListData,
   deleteAnswer,
-  selectAnswer
+  selectAnswer,
+  getCqaQuestion,
+  getCqaQuestionDetail,
+  addQa,
+  getUnsolveQuestion,
+  getUnsloveQuestionDetail,
+  QaList
 }

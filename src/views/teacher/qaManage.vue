@@ -1,23 +1,12 @@
 <template>
   <div class="table-demo">
     <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="68px">
-      <el-form-item label="用户ID" prop="userName">
+      <el-form-item label="问题标题" prop="questionTitle">
         <el-input
-          v-model="queryParams.userId"
-          placeholder="请输入用户ID"
+          v-model="queryParams.questionTitle"
+          placeholder="请输入问题标题"
           clearable
           size="small"
-          style="width: 240px"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="用户名" prop="userName">
-        <el-input
-          v-model="queryParams.userName"
-          placeholder="请输入用户名称"
-          clearable
-          size="small"
-          style="width: 240px"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
@@ -38,7 +27,6 @@
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
-
     <el-card class="list-content" shadow="hover">
       <template v-if="$route.meta.check">
         <el-table
@@ -61,6 +49,7 @@
           <el-table-column label="操作" width="230" align="center" class-name="operation">
             <template slot-scope="scope">
               <a v-if="$route.meta.delete" class="item" @click="handleDelete(scope.row)">删除</a>
+              <a v-if="$route.meta.delete" class="item" @click="detail(scope.row)">详情</a>
             </template>
           </el-table-column>
         </el-table>
@@ -81,31 +70,57 @@
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
+
+    <!-- 新增 -->
+    <el-dialog :title="title" :model="answerDetail" :visible.sync="open" width="800px">
+      <el-row>
+        <el-col :span="24">
+          <h2 style="text-align: center">{{answerDetail.questionTitle}}</h2>
+        </el-col>
+      </el-row>
+      <el-divider></el-divider>
+      <el-row>
+        <el-col :span="24">
+          <div v-html="answerDetail.questionDesc" style="text-align: center"></div>
+        </el-col>
+      </el-row>
+      <el-divider></el-divider>
+      <el-row>
+        <el-col :span="24">
+          <div v-html="answerDetail.content" style="text-align: center">{{answerDetail.content}}</div>
+        </el-col>
+      </el-row>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="deleteAnswer(answerDetail.answerId)">删除</el-button>
+        <el-button @click="cancel">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
 export default {
   data() {
     return {
-      queryParams: {
-        userId: undefined,
-        userName: undefined,
-        dateRange: undefined
-      },
+      open: false,
+      queryParams: {},
+      answerDetail: {},
+      courseDict: [],
       tableLoading: false,
       tableHeader: {
-        id: "ID",
-        name: "用户名",
-        email: "邮箱",
+        question: "问题",
+        courseName: "所属课程",
+        originName: "来源",
         createdTime: "创建时间"
       },
       tableData: [],
+
       pageSize: 20,
       currentPage: 1,
       total: 0
     };
   },
-  mounted() {
+  created() {
+    this.resetQuery();
     this.getData();
   },
   methods: {
@@ -122,11 +137,10 @@ export default {
       setTimeout(() => {
         this.$request.httpRequest({
           method: "post",
-          url: this.API.userData,
+          url: this.API.QaList,
           noLoading: true,
           params: {
-            userId: this.queryParams.userId,
-            userName: this.queryParams.userName,
+            questionTitle: this.queryParams.questionTitle,
             dateRange: this.queryParams.dateRange,
             page: this.currentPage,
             limit: this.pageSize
@@ -141,7 +155,7 @@ export default {
             this.tableLoading = false;
           }
         });
-      }, 3000);
+      }, 300);
     },
 
     handleQuery() {
@@ -150,41 +164,63 @@ export default {
 
     resetQuery() {
       this.queryParams = {
-        userId: undefined,
-        userName: undefined,
+        questionTitle: undefined,
         dateRange: undefined
       };
     },
 
-    deleteUserByUserId(userId) {
+    deleteAnswer(answerId) {
       this.$request.httpRequest({
-          method: "post",
-          url: this.API.deleteUser,
-          params: {
-            userId: userId
-          },
-          success: data => {
-            this.getData();
-            console.log("删除成功")
-            this.msgSuccess("删除成功");
-          },
-          error: e => {
-            this.msgError("删除失败");
-          }
-        });
+        method: "post",
+        url: this.API.deleteQa,
+        params: {
+          answerId: answerId
+        },
+        success: data => {
+          this.open = false;
+          this.getData();
+          this.msgSuccess("删除成功");
+        },
+        error: e => {
+          this.open = false;
+          this.msgError("删除失败");
+        }
+      });
     },
 
-    /** 删除按钮操作 */
     handleDelete(row) {
-      const username = row.name;
-      const userId = row.id
-      this.$confirm("是否确认删除用户:" + username + "?", "警告", {
+      const answerId = row.id;
+      this.$confirm("是否确认删除ID为:" + answerId + "的问题?", "警告", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
-      }).then(()=> {
-        this.deleteUserByUserId(userId)
+      }).then(() => {
+        this.deleteAnswer(answerId);
       });
+    },
+
+    detail(row) {
+      this.open = true;
+      const answerId = row.id;
+      this.$request.httpRequest({
+        method: "post",
+        url: this.API.selectAnswer,
+        params: {
+          answerId: answerId
+        },
+        success: data => {
+          this.answerDetail = {
+            answerId: data.id,
+            questionTitle: data.questionTitle,
+            questionDesc: data.questionDesc,
+            content: data.content
+          };
+        }
+      });
+    },
+
+    cancel() {
+      this.open = false;
     }
   }
 };
@@ -193,5 +229,17 @@ export default {
 @import "~@/styles/table/demo";
 .table-demo {
   padding: 25px;
+}
+.demo-table-expand {
+  font-size: 0;
+}
+.demo-table-expand label {
+  width: 90px;
+  color: #99a9bf;
+}
+.demo-table-expand .el-form-item {
+  margin-right: 0;
+  margin-bottom: 0;
+  width: 50%;
 }
 </style>
