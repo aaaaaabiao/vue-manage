@@ -57,6 +57,8 @@ const addQa = `${apiHost}addQa`
 const getUnsolveQuestion = `${apiHost}getUnsolveQuestion`
 const getUnsloveQuestionDetail = `${apiHost}getUnsloveQuestionDetail`
 const QaList = `${apiHost}QaList`
+const deleteUnsolveQuestion = `${apiHost}deleteUnsolveQuestion`
+const ignoreCqa = `${apiHost}ignoreCqa`
 export default {
   Login,
   LoginByVin,
@@ -89,5 +91,7 @@ export default {
   addQa,
   getUnsolveQuestion,
   getUnsloveQuestionDetail,
-  QaList
+  QaList,
+  deleteUnsolveQuestion,
+  ignoreCqa
 }

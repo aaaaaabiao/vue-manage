@@ -1,6 +1,6 @@
 <template>
   <div class="table-demo">
-    <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="68px">
+    <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="68px">
       <el-form-item label="问题标题" prop="questionTitle">
         <el-input
           v-model="queryParams.questionTitle"
@@ -20,7 +20,7 @@
           range-separator="-"
           start-placeholder="开始日期"
           end-placeholder="结束日期"
-        ></el-date-picker>
+        />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -75,19 +75,19 @@
     <el-dialog :title="title" :model="answerDetail" :visible.sync="open" width="800px">
       <el-row>
         <el-col :span="24">
-          <h2 style="text-align: center">{{answerDetail.questionTitle}}</h2>
+          <h2 style="text-align: center">{{ answerDetail.questionTitle }}</h2>
         </el-col>
       </el-row>
-      <el-divider></el-divider>
+      <el-divider />
       <el-row>
         <el-col :span="24">
-          <div v-html="answerDetail.questionDesc" style="text-align: center"></div>
+          <div style="text-align: center" v-html="answerDetail.questionDesc" />
         </el-col>
       </el-row>
-      <el-divider></el-divider>
+      <el-divider />
       <el-row>
         <el-col :span="24">
-          <div v-html="answerDetail.content" style="text-align: center">{{answerDetail.content}}</div>
+          <div style="text-align: center" v-html="answerDetail.content">{{ answerDetail.content }}</div>
         </el-col>
       </el-row>
       <div slot="footer" class="dialog-footer">
@@ -107,36 +107,36 @@ export default {
       courseDict: [],
       tableLoading: false,
       tableHeader: {
-        question: "问题",
-        courseName: "所属课程",
-        originName: "来源",
-        createdTime: "创建时间"
+        question: '问题',
+        courseName: '所属课程',
+        originName: '来源',
+        createdTime: '创建时间'
       },
       tableData: [],
 
       pageSize: 20,
       currentPage: 1,
       total: 0
-    };
+    }
   },
   created() {
-    this.resetQuery();
-    this.getData();
+    this.resetQuery()
+    this.getData()
   },
   methods: {
     handleCurrentChange(val) {
-      this.currentPage = val;
-      this.getData();
+      this.currentPage = val
+      this.getData()
     },
     handleSizeChange(val) {
-      this.pageSize = val;
-      this.getData();
+      this.pageSize = val
+      this.getData()
     },
     getData() {
-      this.tableLoading = true;
+      this.tableLoading = true
       setTimeout(() => {
         this.$request.httpRequest({
-          method: "post",
+          method: 'post',
           url: this.API.QaList,
           noLoading: true,
           params: {
@@ -146,64 +146,64 @@ export default {
             limit: this.pageSize
           },
           success: data => {
-            console.log(data, data);
-            this.tableData = data.data;
-            this.total = data.totalCount;
-            this.tableLoading = false;
+            console.log(data, data)
+            this.tableData = data.data
+            this.total = data.totalCount
+            this.tableLoading = false
           },
           error: e => {
-            this.tableLoading = false;
+            this.tableLoading = false
           }
-        });
-      }, 300);
+        })
+      }, 300)
     },
 
     handleQuery() {
-      this.getData();
+      this.getData()
     },
 
     resetQuery() {
       this.queryParams = {
         questionTitle: undefined,
         dateRange: undefined
-      };
+      }
     },
 
     deleteAnswer(answerId) {
       this.$request.httpRequest({
-        method: "post",
+        method: 'post',
         url: this.API.deleteQa,
         params: {
           answerId: answerId
         },
         success: data => {
-          this.open = false;
-          this.getData();
-          this.msgSuccess("删除成功");
+          this.open = false
+          this.getData()
+          this.msgSuccess('删除成功')
         },
         error: e => {
-          this.open = false;
-          this.msgError("删除失败");
+          this.open = false
+          this.msgError('删除失败')
         }
-      });
+      })
     },
 
     handleDelete(row) {
-      const answerId = row.id;
-      this.$confirm("是否确认删除ID为:" + answerId + "的问题?", "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
+      const answerId = row.id
+      this.$confirm('是否确认删除ID为:' + answerId + '的问题?', '警告', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
       }).then(() => {
-        this.deleteAnswer(answerId);
-      });
+        this.deleteAnswer(answerId)
+      })
     },
 
     detail(row) {
-      this.open = true;
-      const answerId = row.id;
+      this.open = true
+      const answerId = row.id
       this.$request.httpRequest({
-        method: "post",
+        method: 'post',
         url: this.API.selectAnswer,
         params: {
           answerId: answerId
@@ -214,16 +214,16 @@ export default {
             questionTitle: data.questionTitle,
             questionDesc: data.questionDesc,
             content: data.content
-          };
+          }
         }
-      });
+      })
     },
 
     cancel() {
-      this.open = false;
+      this.open = false
     }
   }
-};
+}
 </script>
 <style lang="scss">
 @import "~@/styles/table/demo";
