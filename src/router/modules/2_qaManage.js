@@ -4,7 +4,7 @@ const userManage = {
   redirect: '/qa/question',
   name: 'qaManage',
   meta: {
-    title: '问答库管理'
+    title: '讨论区管理'
   },
   children: [
     {

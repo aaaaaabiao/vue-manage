@@ -72,26 +72,20 @@
     />
 
     <!-- 新增 -->
-    <el-dialog :title="title" :model="answerDetail" :visible.sync="open" width="800px">
-      <el-row>
-        <el-col :span="24">
-          <h2 style="text-align: center">{{ answerDetail.questionTitle }}</h2>
-        </el-col>
-      </el-row>
-      <el-divider />
-      <el-row>
-        <el-col :span="24">
-          <div style="text-align: center" v-html="answerDetail.questionDesc" />
-        </el-col>
-      </el-row>
-      <el-divider />
-      <el-row>
-        <el-col :span="24">
-          <div style="text-align: center" v-html="answerDetail.content">{{ answerDetail.content }}</div>
-        </el-col>
-      </el-row>
+    <el-dialog :title="title" :visible.sync="open" width="800px">
+      <div>
+        <p>问题:</p>
+        <p style="text-indent: 2em" v-text="qa.title" />
+      </div>
+      <p>答案:</p>
+      <el-form ref="form">
+        <el-form-item>
+          <el-input v-model="qa.answer" type="textarea" :rows="15" />
+        </el-form-item>
+      </el-form>
+
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="deleteAnswer(answerDetail.answerId)">删除</el-button>
+        <el-button type="primary" @click="updateAnswer()">确认修改</el-button>
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
@@ -114,6 +108,11 @@ export default {
       },
       tableData: [],
 
+      qa: {
+        id: undefined,
+        title: 'TCP三次握手',
+        answer: '你吃没了，我吃了,你呢？，我也吃了'
+      },
       pageSize: 20,
       currentPage: 1,
       total: 0
@@ -169,12 +168,13 @@ export default {
       }
     },
 
-    deleteAnswer(answerId) {
+    deleteQa(qId, courseName) {
       this.$request.httpRequest({
         method: 'post',
         url: this.API.deleteQa,
         params: {
-          answerId: answerId
+          qId: qId,
+          courseName: courseName
         },
         success: data => {
           this.open = false
@@ -189,32 +189,46 @@ export default {
     },
 
     handleDelete(row) {
-      const answerId = row.id
-      this.$confirm('是否确认删除ID为:' + answerId + '的问题?', '警告', {
+      const qId = row.id
+      const courseName = row.courseName
+      this.$confirm('是否确认删除ID为:' + qId + '的问题?', '警告', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.deleteAnswer(answerId)
+        this.deleteQa(qId, courseName)
       })
     },
 
     detail(row) {
       this.open = true
-      const answerId = row.id
+      const qId = row.id
       this.$request.httpRequest({
         method: 'post',
-        url: this.API.selectAnswer,
+        url: this.API.selectQaById,
         params: {
-          answerId: answerId
+          qId: qId
         },
         success: data => {
-          this.answerDetail = {
-            answerId: data.id,
-            questionTitle: data.questionTitle,
-            questionDesc: data.questionDesc,
-            content: data.content
+          this.qa = {
+            id: data.id,
+            title: data.question,
+            answer: data.answer
           }
+        }
+      })
+    },
+    updateAnswer() {
+      this.$request.httpRequest({
+        method: 'post',
+        url: this.API.updateAnswer,
+        params: {
+          qId: this.qa.id,
+          answer: this.qa.answer
+        },
+        success: data => {
+          this.msgSuccess('更新成功')
+          this.open = false
         }
       })
     },

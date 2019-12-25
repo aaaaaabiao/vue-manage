@@ -12,13 +12,10 @@ const SendSms = `${apiHost}sendSms`
 const GetPermissionData = `${apiHost}permission`
 // 表格模拟数据
 const GetTableData = `${apiHost}table`
-
-
 // 用户数据
 const userData = `${apiHost}userData`
 // 删除学生用户
 const deleteUser = `${apiHost}deleteStudent`
- 
 // 管理员数据
 const adminData = `${apiHost}adminData`
 // 添加管理员
@@ -27,7 +24,6 @@ const addAdmin = `${apiHost}addAdmin`
 const updateAdmin = `${apiHost}updateAdmin`
 // 删除管理员
 const deleteAdmin = `${apiHost}deleteAdmin`
-
 
 // 根据Id查询
 const selectAdminByID = `${apiHost}selectAdminByID`
@@ -59,6 +55,12 @@ const getUnsloveQuestionDetail = `${apiHost}getUnsloveQuestionDetail`
 const QaList = `${apiHost}QaList`
 const deleteUnsolveQuestion = `${apiHost}deleteUnsolveQuestion`
 const ignoreCqa = `${apiHost}ignoreCqa`
+const deleteQa = `${apiHost}deleteQa`
+const selectQaById = `${apiHost}selectQaById`
+const updateAnswer = `${apiHost}updateAnswer`
+
+
+
 export default {
   Login,
   LoginByVin,
@@ -93,5 +95,8 @@ export default {
   getUnsloveQuestionDetail,
   QaList,
   deleteUnsolveQuestion,
-  ignoreCqa
+  ignoreCqa,
+  deleteQa,
+  selectQaById,
+  updateAnswer
 }

@@ -58,32 +58,11 @@ export default {
       pageSize: 20,
       currentPage: 1,
       total: 0,
-      tableData: [
-        {
-          id: 1,
-          title: 'TCP为什么三次握手？'
-        },
-        {
-          id: 2,
-          title: 'TCP为什么三次握手？'
-        },
-        {
-          id: 3,
-          title: 'TCP为什么三次握手？'
-        },
-        {
-          id: 4,
-          title: 'TCP为什么三次握手？'
-        }
-      ],
-
+      tableData: [],
       from: {
-
+        answer: undefined
       },
-
-      unsolveQuestion: {
-        title: 'TCP为什么三次握手？'
-      },
+      unsolveQuestion: {},
 
       show: false,
       questionId: undefined
@@ -146,6 +125,8 @@ export default {
     detail(row) {
       const id = row.id
       this.questionId = row.id
+      this.show = false
+      this.unsolveQuestion.title = undefined
       this.$request.httpRequest({
         method: 'post',
         params: {
@@ -157,7 +138,6 @@ export default {
           this.show = true
         }
       })
-      this.show = true
     },
 
     addQa() {
@@ -171,6 +151,7 @@ export default {
         },
         url: this.API.addQa,
         success: data => {
+          this.from.answer = ''
           this.msgSuccess('添加成功')
           this.show = false
           this.getQuestionList()
@@ -179,10 +160,8 @@ export default {
           this.msgError('添加失败')
         }
       })
-
-      this.msgSuccess('添加成功')
-      this.show = false
     }
+
   }
 }
 </script>

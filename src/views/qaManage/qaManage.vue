@@ -1,48 +1,14 @@
 <template>
   <div class="table-demo">
     <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="68px">
-      <el-form-item label="问题ID" prop="questionId">
+      <el-form-item label="问题标题" prop="questionTitle">
         <el-input
-          v-model="queryParams.questionId"
-          placeholder="请输入问题ID"
+          v-model="queryParams.questionTitle"
+          placeholder="请输入问题标题"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
         />
-      </el-form-item>
-      <el-form-item label="标题" prop="userName">
-        <el-input
-          v-model="queryParams.title"
-          placeholder="请输入标题"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-
-      <el-form-item label="创建人" prop="userName">
-        <el-input
-          v-model="queryParams.creator"
-          placeholder="请输入用户名称"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="课程" prop="courseId">
-        <el-select
-          v-model="queryParams.courseId"
-          placeholder="课程"
-          clearable
-          size="small"
-        >
-          <el-option
-            v-for="course in courseDict"
-            :key="course.value"
-            :label="course.label"
-            :value="course.value"
-          />
-        </el-select>
       </el-form-item>
       <el-form-item label="创建时间">
         <el-date-picker
@@ -71,42 +37,6 @@
           style="width: 100%"
           class="table-content"
         >
-          <el-table-column type="expand">
-            <template slot-scope="props">
-              <el-form label-position="left" inline class="demo-table-expand">
-                <el-form-item label="问题ID">
-                  <span>{{ props.row.id }}</span>
-                </el-form-item>
-                <el-form-item label="标题">
-                  <span>{{ props.row.title }}</span>
-                </el-form-item>
-                <el-form-item label="描述">
-                  <span>{{ props.row.description }}</span>
-                </el-form-item>
-                <el-form-item label="课程">
-                  <span>{{ props.row.courseName }}</span>
-                </el-form-item>
-                <el-form-item label="用户名">
-                  <span>{{ props.row.userName }}</span>
-                </el-form-item>
-                <el-form-item label="创建时间">
-                  <span>{{ props.row.createTime }}</span>
-                </el-form-item>
-                <el-form-item label="回答数">
-                  <span>{{ props.row.answers }}</span>
-                </el-form-item>
-                <el-form-item label="关注数">
-                  <span>{{ props.row.followers }}</span>
-                </el-form-item>
-                <el-form-item label="收藏数">
-                  <span>{{ props.row.collections }}</span>
-                </el-form-item>
-                <el-form-item label="评论数">
-                  <span>{{ props.row.comments }}</span>
-                </el-form-item>
-              </el-form>
-            </template>
-          </el-table-column>
           <el-table-column type="index" label="序号" align="center" sortable width="50" />
           <el-table-column
             v-for="(item,index) in tableHeader"
@@ -119,6 +49,7 @@
           <el-table-column label="操作" width="230" align="center" class-name="operation">
             <template slot-scope="scope">
               <a v-if="$route.meta.delete" class="item" @click="handleDelete(scope.row)">删除</a>
+              <a v-if="$route.meta.delete" class="item" @click="detail(scope.row)">详情</a>
             </template>
           </el-table-column>
         </el-table>
@@ -139,34 +70,57 @@
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
+
+    <!-- 新增 -->
+    <el-dialog :title="title" :visible.sync="open" width="800px">
+      <div>
+        <p>问题:</p>
+        <p style="text-indent: 2em" v-text="qa.title" />
+      </div>
+      <p>答案:</p>
+      <div v-html="qa.answer" />
+      <!-- <el-form ref="form">
+        <el-form-item>
+          <el-input v-model="qa.answer" type="textarea" :rows="15" />
+        </el-form-item>
+      </el-form> -->
+
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="cancel">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
 export default {
   data() {
     return {
+      open: false,
       queryParams: {},
-
+      answerDetail: {},
       courseDict: [],
       tableLoading: false,
       tableHeader: {
-        id: 'ID',
-        title: '标题',
+        question: '问题',
         courseName: '所属课程',
-        userName: '创建人',
-        createdAt: '创建时间'
+        originName: '来源',
+        createdTime: '创建时间'
       },
       tableData: [],
 
+      qa: {
+        id: undefined,
+        title: 'TCP三次握手',
+        answer: '你吃没了，我吃了,你呢？，我也吃了'
+      },
       pageSize: 20,
       currentPage: 1,
       total: 0
     }
   },
-  mounted() {
+  created() {
     this.resetQuery()
     this.getData()
-    this.getCourseInfo()
   },
   methods: {
     handleCurrentChange(val) {
@@ -182,13 +136,10 @@ export default {
       setTimeout(() => {
         this.$request.httpRequest({
           method: 'post',
-          url: this.API.questionListData,
+          url: this.API.QaList,
           noLoading: true,
           params: {
-            questionId: this.queryParams.questionId,
-            title: this.queryParams.title,
-            creator: this.queryParams.creator,
-            courseId: this.queryParams.courseId,
+            questionTitle: this.queryParams.questionTitle,
             dateRange: this.queryParams.dateRange,
             page: this.currentPage,
             limit: this.pageSize
@@ -203,23 +154,7 @@ export default {
             this.tableLoading = false
           }
         })
-      }, 500)
-    },
-    // 获取所有课程
-    getCourseInfo() {
-      this.$request.httpRequest({
-        method: 'post',
-        url: this.API.getAllCourseInfo,
-        success: data => {
-          data.forEach(item => {
-            const course = {}
-            course.label = item.courseName
-            course.value = item.id
-            this.courseDict.push(course)
-          })
-        }
-
-      })
+      }, 300)
     },
 
     handleQuery() {
@@ -228,40 +163,78 @@ export default {
 
     resetQuery() {
       this.queryParams = {
-        questionId: undefined,
-        title: undefined,
-        creator: undefined,
-        courseId: undefined,
-        dateRange: []
+        questionTitle: undefined,
+        dateRange: undefined
       }
     },
 
-    deleteQuestion(questionId) {
+    deleteQa(qId, courseName) {
       this.$request.httpRequest({
         method: 'post',
-        url: this.API.deleteQuestion,
+        url: this.API.deleteQa,
         params: {
-          questionId: questionId
+          qId: qId,
+          courseName: courseName
         },
         success: data => {
+          this.open = false
           this.getData()
           this.msgSuccess('删除成功')
         },
         error: e => {
+          this.open = false
           this.msgError('删除失败')
         }
       })
     },
 
     handleDelete(row) {
-      const questionId = row.id
-      this.$confirm('是否确认删除ID为:' + questionId + '的问题?', '警告', {
+      const qId = row.id
+      const courseName = row.courseName
+      this.$confirm('是否确认删除ID为:' + qId + '的问题?', '警告', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.deleteQuestion(questionId)
+        this.deleteQa(qId, courseName)
       })
+    },
+
+    detail(row) {
+      this.open = true
+      const qId = row.id
+      this.$request.httpRequest({
+        method: 'post',
+        url: this.API.selectQaById,
+        params: {
+          qId: qId
+        },
+        success: data => {
+          this.qa = {
+            id: data.id,
+            title: data.question,
+            answer: data.answer
+          }
+        }
+      })
+    },
+    updateAnswer() {
+      this.$request.httpRequest({
+        method: 'post',
+        url: this.API.updateAnswer,
+        params: {
+          qId: this.qa.id,
+          answer: this.qa.answer
+        },
+        success: data => {
+          this.msgSuccess('更新成功')
+          this.open = false
+        }
+      })
+    },
+
+    cancel() {
+      this.open = false
     }
   }
 }

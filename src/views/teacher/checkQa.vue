@@ -37,7 +37,7 @@
             </div>
             <div>
               <p>描述:</p>
-              <p style="text-indent: 2em" v-text="cqaInfo.desc" />
+              <p style="text-indent: 2em" v-html="cqaInfo.desc" />
             </div>
             <div>
               <p>答案:</p>
@@ -59,7 +59,7 @@
 
             <el-form ref="form" v-model="form">
               <el-form-item>
-                <el-input v-model="from.answer" type="textarea" :rows="10" />
+                <el-input v-model="form.answer" type="textarea" :rows="10" />
               </el-form-item>
               <el-form-item>
                 <el-button type="primary" size="mini" style="float:right" @click="addQa">添加答案</el-button>
@@ -80,7 +80,7 @@ export default {
       currentPage: 1,
       total: 0,
       tableData: [],
-      from: {},
+      form: {},
       cqaInfo: {},
       show: false,
       questionId: undefined
@@ -141,6 +141,7 @@ export default {
     },
 
     detail(row) {
+      this.show = false
       const id = row.id
       this.questionId = id
       this.$request.httpRequest({
@@ -155,11 +156,10 @@ export default {
           this.cqaInfo.title = question.title
           this.cqaInfo.desc = question.description
           this.cqaInfo.bestAnswer = answer.content
-
+          console.log(this.cqaInfo)
           this.show = true
         }
       })
-      this.show = true
     },
 
     checkQa() {
