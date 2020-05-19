@@ -1,6 +1,7 @@
+/* eslint-disable vue/this-in-template */
 <template>
   <div class="table-demo">
-    <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="68px">
+    <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="68px">
       <el-form-item label="用户ID" prop="userName">
         <el-input
           v-model="queryParams.userId"
@@ -31,7 +32,7 @@
           range-separator="-"
           start-placeholder="开始日期"
           end-placeholder="结束日期"
-        ></el-date-picker>
+        />
       </el-form-item>
       <el-form-item label="角色" prop="role">
         <el-select
@@ -54,14 +55,14 @@
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
-    <el-row :gutter="10" class="mb8">
+    <!-- <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAdd">新增</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button type="warning" icon="el-icon-download" size="mini" @click="handleExport">导出</el-button>
       </el-col>
-    </el-row>
+    </el-row>-->
     <el-card class="list-content" shadow="hover">
       <template v-if="$route.meta.check">
         <el-table
@@ -83,8 +84,16 @@
           />
           <el-table-column label="操作" width="230" align="center" class-name="operation">
             <template slot-scope="scope">
-              <a class="item" @click="handleUpdate(scope.row)">修改</a>
-              <a v-if="$route.meta.delete" class="item" @click="handleDelete(scope.row)">删除</a>
+              <a
+                v-if="scope.row.courseType == undefined && scope.row.role != '管理员' && scope.row.role != '学生'"
+                class="item"
+                @click="handleUpdate(scope.row)"
+              >设置课程权限</a>
+              <a
+                v-if="scope.row.courseType != undefined && scope.row.role != '管理员' && scope.row.role != '学生'"
+                class="item"
+                @click="handleDelete(scope.row)"
+              >撤销权限</a>
             </template>
           </el-table-column>
         </el-table>
@@ -112,15 +121,15 @@
         <el-row>
           <el-col :span="12">
             <el-form-item label="用户名" prop="username">
-              <el-input v-model="addAdminform.username" placeholder="请输入角色名称" />
+              <el-input v-model="addAdminform.username" :disabled="true" />
             </el-form-item>
           </el-col>
-          <el-col :span="12">
+          <!-- <el-col :span="12">
             <el-form-item label="密码" prop="password">
               <el-input v-model="addAdminform.password" placeholder="请输入密码" />
             </el-form-item>
-          </el-col>
-          <el-col :span="12">
+          </el-col>-->
+          <!-- <el-col :span="12">
             <el-form-item label="角色" prop="type">
               <el-select v-model="addAdminform.type" :placeholder="请选择角色" style="width:100%;">
                 <el-option
@@ -128,19 +137,19 @@
                   :key="item.value"
                   :label="item.label"
                   :value="item.value"
-                ></el-option>
+                />
               </el-select>
             </el-form-item>
-          </el-col>
-          <el-col :span="12" v-if="this.addAdminform.type == 3 || this.addAdminform.type == 4">
+          </el-col>-->
+          <el-col :span="12">
             <el-form-item label="课程">
-              <el-select v-model="addAdminform.courseId" :placeholder="请选择对应课程" style="width:100%;">
+              <el-select v-model="courseType" :placeholder="请选择对应课程" style="width:100%;">
                 <el-option
                   v-for="item in courses"
                   :key="item.value"
                   :label="item.label"
                   :value="item.value"
-                ></el-option>
+                />
               </el-select>
             </el-form-item>
           </el-col>
@@ -156,21 +165,22 @@
   <!-- 添加或修改参数配置对话框 -->
 </template>
 <script>
+import { dateFormat } from '@/assets/utils/index.js'
 export default {
   data() {
     return {
       // 表单参数
       addAdminform: {},
       courses: [],
-
+      courseType: '',
       rules: {
         username: [
-          { required: true, message: "用户名称不能为空", trigger: "blur" }
+          { required: true, message: '用户名称不能为空', trigger: 'blur' }
         ],
         password: [
-          { required: true, message: "密码名称不能为空", trigger: "blur" }
+          { required: true, message: '密码名称不能为空', trigger: 'blur' }
         ],
-        role: [{ required: true, message: "角色不能为空", trigger: "blur" }]
+        role: [{ required: true, message: '角色不能为空', trigger: 'blur' }]
       },
       open: false,
       queryParams: {
@@ -180,43 +190,40 @@ export default {
         dateRange: undefined
       },
 
-      roleDict: [
-        { label: "管理员", value: 2 },
-        { label: "课程负责人", value: 3 }
-        ],
+      roleDict: [{ label: '学生', value: 0 }, { label: '管理员', value: 1 }, { label: '教师', value: 2 }],
 
       tableLoading: false,
       tableHeader: {
-        id: "ID",
-        name: "用户名",
-        role: "类型",
-        courseType: "所属课程",
-        createdTime: "创建时间"
+        id: 'ID',
+        name: '用户名',
+        role: '类型',
+        courseType: '所属课程',
+        createdTime: '创建时间'
       },
       tableData: [],
 
-      pageSize: 20,
+      pageSize: 10,
       currentPage: 1,
       total: 0
-    };
+    }
   },
   mounted() {
-    this.getData();
+    this.getData()
   },
   methods: {
     handleCurrentChange(val) {
-      this.currentPage = val;
-      this.getData();
+      this.currentPage = val
+      this.getData()
     },
     handleSizeChange(val) {
-      this.pageSize = val;
-      this.getData();
+      this.pageSize = val
+      this.getData()
     },
     getData() {
-      this.tableLoading = true;
+      this.tableLoading = true
       setTimeout(() => {
         this.$request.httpRequest({
-          method: "post",
+          method: 'post',
           url: this.API.adminData,
           noLoading: true,
           params: {
@@ -224,24 +231,27 @@ export default {
             userName: this.queryParams.userName,
             dateRange: this.queryParams.dateRange,
             role: this.queryParams.roleId,
-            roles: [2, 3],
             page: this.currentPage,
             limit: this.pageSize
           },
           success: data => {
-            console.log(data, data);
-            this.tableData = data.data;
-            this.total = data.totalCount;
-            this.tableLoading = false;
+            console.log(data, data)
+            const userList = data.data
+            userList.forEach(item => {
+              item.createdTime = dateFormat(item.createdTime)
+            })
+            this.tableData = userList
+            this.total = data.totalCount
+            this.tableLoading = false
           },
           error: e => {
-            this.tableLoading = false;
+            this.tableLoading = false
           }
-        });
-      }, 500);
+        })
+      }, 500)
     },
     test(row) {
-      console.log("tableRow", row);
+      console.log('tableRow', row)
     },
 
     reset() {
@@ -251,25 +261,25 @@ export default {
         password: undefined,
         type: undefined,
         courseId: undefined
-      };
+      }
     },
     handleAdd() {
-      this.getCourseInfo();
-      this.reset();
-      this.open = true;
-      this.title = "添加人员";
+      this.getCourseInfo()
+      this.reset()
+      this.open = true
+      this.title = '添加人员'
     },
-    //取消按钮
+    // 取消按钮
     cancel() {
-      this.open = false;
+      this.open = false
     },
 
-    //修改
+    // 修改
     handleUpdate(row) {
-      this.getCourseInfo();
-      const userId = row.id;
+      this.getCourseInfo()
+      const userId = row.id
       this.$request.httpRequest({
-        method: "post",
+        method: 'post',
         url: this.API.selectAdminByID,
         params: {
           userId: userId
@@ -282,113 +292,132 @@ export default {
             type: data.type,
             courseId: data.courseId
           }),
-            (this.title = "修改人员");
-          this.open = true;
+          (this.title = '课程权限设置')
+          this.open = true
         }
-      });
+      })
     },
 
     handleQuery() {
-      this.getData();
+      this.getData()
     },
 
     deleteAdmin(userId) {
       this.$request.httpRequest({
-        method: "post",
+        method: 'post',
         url: this.API.deleteAdmin,
         params: {
           userId: userId
         },
         success: data => {
-          this.getData();
-          this.msgSuccess("删除成功");
+          this.getData()
+          this.msgSuccess('删除成功')
         },
         error: e => {
-          this.msgError("删除失败");
+          this.msgError('删除失败')
         }
-      });
+      })
     },
 
     /** 删除按钮操作 */
     handleDelete(row) {
-      const username = row.name;
-      const userId = row.id;
-      this.$confirm("是否确认删除用户:" + username + "?", "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
+      const username = row.name
+      this.$confirm('是否撤销用户:' + username + '权限?', '警告', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
       }).then(() => {
-        this.deleteAdmin(userId);
-      });
+        this.authTeacher(2, username, undefined)
+      })
     },
 
-    //获取所有课程
+    // 获取所有课程
     getCourseInfo() {
       this.courses = []
       this.$request.httpRequest({
-        method: "post",
+        method: 'post',
         url: this.API.getAllCourseInfo,
         success: data => {
           data.forEach(item => {
-            const course = {};
-            course.label = item.courseName;
-            course.value = item.id;
-            this.courses.push(course);
-          });
+            const course = {}
+            course.label = item.courseName
+            course.value = item.id
+            this.courses.push(course)
+          })
         }
-      });
+      })
     },
 
-    //更新管理员信息
+    // 更新管理员信息
     updateUser() {
-      if(this.addAdminform.type != 3 && this.addAdminform.type != 4) {
+      if (this.addAdminform.type != 3 && this.addAdminform.type != 4) {
         this.addAdminform.courseId = -1
       }
       this.$request.httpRequest({
-        method: "post",
+        method: 'post',
         url: this.API.updateAdmin,
         params: this.addAdminform,
         success: data => {
-          this.msgSuccess("修改成功");
-          this.open = false;
-          this.getData();
+          this.msgSuccess('修改成功')
+          this.open = false
+          this.getData()
         },
         error: e => {
-          this.open = false;
-          this.msgError("修改失败");
+          this.open = false
+          this.msgError('修改失败')
         }
-      });
+      })
     },
 
-    //添加管理员
+    // 添加管理员
     addUser() {
       this.$request.httpRequest({
-        method: "post",
+        method: 'post',
         url: this.API.addAdmin,
         params: this.addAdminform,
         success: data => {
-          this.msgSuccess("添加成功");
-          this.open = false;
-          this.getData();
+          this.msgSuccess('添加成功')
+          this.open = false
+          this.getData()
         },
         error: e => {
-          this.open = false;
-          this.msgError("添加失败");
+          this.open = false
+          this.msgError('添加失败')
         }
-      });
+      })
     },
 
-    //提交表单
+    // 提交表单
     submitForm() {
       this.$refs.addAdminform.validate(valid => {
         if (valid) {
-          if (this.addAdminform.userId != undefined) {
-            this.updateUser();
-          } else {
-            this.addUser();
-          }
+          const username = this.addAdminform.username
+          const courseType = this.courseType
+          console.log(username + '+' + courseType)
+          this.authTeacher(1, username, courseType)
         }
-      });
+      })
+    },
+
+    authTeacher(opt, username, courseType) {
+      this.$request.httpRequest({
+        method: 'post',
+        url: this.API.authTeacher,
+        params: {
+          opt: opt,
+          username: username,
+          courseType: courseType
+        },
+        success: data => {
+          this.msgSuccess('操作成功')
+          this.open = false
+          this.getData()
+        },
+        error: e => {
+          this.open = false
+          this.msgError('操作失败')
+        }
+      })
     },
 
     resetQuery() {
@@ -397,10 +426,10 @@ export default {
         userName: undefined,
         dateRange: undefined,
         roleId: undefined
-      };
+      }
     }
   }
-};
+}
 </script>
 <style lang="scss">
 @import "~@/styles/table/demo";

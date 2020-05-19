@@ -58,6 +58,10 @@ const ignoreCqa = `${apiHost}ignoreCqa`
 const deleteQa = `${apiHost}deleteQa`
 const selectQaById = `${apiHost}selectQaById`
 const updateAnswer = `${apiHost}updateAnswer`
+const getTeachers = `${apiHost}getTeachers`
+
+
+const authTeacher = `${apiHost}authTeacher`
 
 
 
@@ -98,5 +102,7 @@ export default {
   ignoreCqa,
   deleteQa,
   selectQaById,
-  updateAnswer
+  updateAnswer,
+  authTeacher,
+  getTeachers
 }

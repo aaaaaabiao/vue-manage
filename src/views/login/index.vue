@@ -68,32 +68,31 @@
 
 <script>
 export default {
-  name: "Login",
+  name: 'Login',
   data() {
-
     return {
       roleDict: this.COMMON.roleDict,
       loginForm: {
-        user: "",
-        password: "",
+        user: '',
+        password: '',
         roleId: undefined
       },
       loginByPswRules: {
-        user: [{ required: true, trigger: "blur", message: "请输入用户名" }],
-        password: [{ required: true, trigger: "blur", message: "请输入密码" }],
-        roleId: [{required: true, trigger: "blur", message: "请选择角色"}]
+        user: [{ required: true, trigger: 'blur', message: '请输入用户名' }],
+        password: [{ required: true, trigger: 'blur', message: '请输入密码' }],
+        roleId: [{ required: true, trigger: 'blur', message: '请选择角色' }]
       },
       loading: false,
-      pwdType: "password",
+      pwdType: 'password',
       redirect: undefined,
       isOvertime: false,
       time: 60
-    };
+    }
   },
   watch: {
     $route: {
       handler: function(route) {
-        this.redirect = route.query && route.query.redirect;
+        this.redirect = route.query && route.query.redirect
       },
       immediate: true
     }
@@ -102,30 +101,30 @@ export default {
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
-          this.loading = true;
-          let params = {};
+          this.loading = true
+          let params = {}
 
           params = {
             username: this.loginForm.user,
             password: this.loginForm.password,
             roleId: this.loginForm.roleId
-          };
+          }
           this.$store
-            .dispatch("Login", params)
+            .dispatch('Login', params)
             .then(() => {
-              this.loading = false;
-              this.$router.push({ path: this.redirect || "/home" });
+              this.loading = false
+              this.$router.push({ path: this.redirect || '/home' })
             })
             .catch(() => {
-              this.loading = false;
-            });
+              this.loading = false
+            })
         } else {
-          return false;
+          return false
         }
-      });
+      })
     }
   }
-};
+}
 </script>
 
 <style rel="stylesheet/scss" lang="scss">

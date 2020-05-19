@@ -31,7 +31,8 @@ router.beforeEach(async(to, from, next) => {
           // 防止进入死循环
           await store.commit('SET_TOKEN', token)
           // 是不是超级管理员
-          const isSuperAdmin = store.state.user.roles.some(item => item.id === 1)
+          // const isSuperAdmin = store.state.user.roles.some(item => item.id === 1)
+          const isSuperAdmin = false
           console.log(isSuperAdmin)
           const accessRoutes = await store.dispatch('GenerateRoutes', isSuperAdmin)
           // 异步加载路由

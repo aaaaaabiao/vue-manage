@@ -48,7 +48,7 @@
         >
           <el-table-column label="知识点" align="center" prop="title" />
           <el-table-column label="创建人" align="center" prop="creator" />
-          <el-table-column label="创建时间" align="center" prop="createdTime" width="160" />
+          <!-- <el-table-column label="创建时间" align="center" prop="createdTime" width="160" /> -->
           <el-table-column
             label="操作"
             align="center"
@@ -161,7 +161,7 @@ export default {
     }
   },
   created() {
-    this.getCourseInfo()
+    // this.getCourseInfo()
     this.getList()
     this.getTreeselect()
   },

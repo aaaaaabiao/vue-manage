@@ -25,6 +25,7 @@
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAdd">新增</el-button>
       </el-form-item>
     </el-form>
     <el-card class="list-content" shadow="hover">
@@ -89,12 +90,34 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+
+    <!-- 新增问答对 -->
+    <el-dialog :title="addQatitle" :visible.sync="addopen" width="800px">
+      <el-form ref="qaForm" :model="qaForm" label-width="80px">
+        <el-row>
+          <el-form-item label="问题" prop="question">
+            <el-input v-model="qaForm.question" />
+          </el-form-item>
+        </el-row>
+        <el-row>
+          <el-form-item label="答案" prop="answer">
+            <el-input v-model="qaForm.answer" type="textarea" :row="30" />
+          </el-form-item>
+        </el-row>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="addQa">确 定</el-button>
+        <el-button @click="cancelQaDialog">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
+import { dateFormat } from '@/assets/utils/index.js'
 export default {
   data() {
     return {
+      addopen: false,
       open: false,
       queryParams: {},
       answerDetail: {},
@@ -107,7 +130,10 @@ export default {
         createdTime: '创建时间'
       },
       tableData: [],
-
+      qaForm: {
+        question: undefined,
+        answer: undefined
+      },
       qa: {
         id: undefined,
         title: 'TCP三次握手',
@@ -115,7 +141,8 @@ export default {
       },
       pageSize: 20,
       currentPage: 1,
-      total: 0
+      total: 0,
+      addQatitle: undefined
     }
   },
   created() {
@@ -146,7 +173,11 @@ export default {
           },
           success: data => {
             console.log(data, data)
-            this.tableData = data.data
+            const qaList = data.data
+            qaList.forEach(item => {
+              item.createdTime = dateFormat(item.createdTime)
+            })
+            this.tableData = qaList
             this.total = data.totalCount
             this.tableLoading = false
           },
@@ -235,6 +266,39 @@ export default {
 
     cancel() {
       this.open = false
+    },
+
+    handleAdd() {
+      this.qaForm = {
+        question: undefined,
+        answer: undefined
+      }
+      this.addQatitle = '添加问答对'
+      this.addopen = true
+    },
+
+    cancelQaDialog() {
+      this.addopen = false
+    },
+
+    addQa() {
+      this.$request.httpRequest({
+        method: 'post',
+        params: {
+          'question': this.qaForm.question,
+          'answer': this.qaForm.answer,
+          'origin': 3
+        },
+        url: this.API.addQa,
+        success: data => {
+          this.msgSuccess('添加成功')
+          this.addopen = false
+          this.getData()
+        },
+        error: e => {
+          this.msgError('添加失败')
+        }
+      })
     }
   }
 }

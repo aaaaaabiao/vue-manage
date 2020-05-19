@@ -142,6 +142,7 @@
   </div>
 </template>
 <script>
+import { dateFormat } from '@/assets/utils/index.js'
 export default {
   data() {
     return {
@@ -195,7 +196,11 @@ export default {
           },
           success: data => {
             console.log(data, data)
-            this.tableData = data.data
+            const questionList = data.data
+            questionList.forEach(item => {
+              item.createdAt = dateFormat(item.createdAt)
+            })
+            this.tableData = questionList
             this.total = data.totalCount
             this.tableLoading = false
           },
